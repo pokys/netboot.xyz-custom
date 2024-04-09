@@ -3,10 +3,10 @@
 ### netboot.xyz-custom menu
 ###
 
-:start
-echo Hello world!
-sleep 10
-goto custom_exit
+:option_one
+kernel http://path.to/vmlinuz
+initrd http://path.to/initrd
+imgargs vmlinuz put_kernel_img_args_here
+boot || goto custom_exit
 
-:custom_exit
 exit 0
