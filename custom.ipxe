@@ -6,7 +6,8 @@
 :custom
 clear custom_choice
 menu ESXi
-item --gap Boot ESXi Installer
+item --gap Custom Boot Menu
+item win11_iso ${space} Windows11
 item esxi_70_kickstart ${space} 7.0 Automated Install
 item esxi_70_install ${space} 7.0 Installer
 item esxi_70_iso ${space} 7.0 ISO
@@ -14,6 +15,10 @@ choose custom_choice || goto custom_exit
 echo ${cls}
 goto ${custom_choice}
 goto custom_exit
+
+:win11_iso
+sanboot --no-describe --drive 0x80 https://software.download.prss.microsoft.com/dbazure/Win11_23H2_Czech_x64v2.iso?t=fe16418c-ef3d-4ed7-a882-421fe505d8ea&P1=1712743409&P2=601&P3=2&P4=l978gA5qj5Qb98q5uBEG5%2bmMJMRmAar5O7JtLagld7lnPHc540hRFOU3DF2cLkcyy2svNOvvYnYH22szAxcmXut0Ai11EmI9eXjLAHm3jAQZYBvvNb4PvYOh8RyUQckYBj9CEKBZIlBtAcwySF0VGVZ9TWWqHIFGcVvOa049Xzv884pMSwnftwLkkzCFgxh24xGCzpA7f75mG90wXlHryH5i0VF8DBct8g8VHphm6Q3rHI4%2bOHpa1oDpyiJDoLgZcRPBXMYzKNM%2bphxRW%2b%2fmEsQWJF0wTqoDqVm8HrEKYF%2f6UMjXfcpPcmgRM9OmoXzNvCqN5p8EXGdEhIG0O63Ofg%3d%3d || goto custom_exit
+boot || goto custom_exit
 
 :esxi_70_iso
 sanboot --no-describe --drive 0x80 http://boot.codybunch.lab/ISO/VMware/ESXi/v7.0.0U1d/ESXi-7.0U1d-17551050-standard-customized.iso || goto custom_exit
