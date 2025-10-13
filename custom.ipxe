@@ -18,7 +18,7 @@ goto ${custom_choice}
 goto custom_exit
 
 
-
+:debian12_manual
 kernel ${base_url}/linux vga=788 auto=false --- || goto custom_exit
 initrd ${base_url}/initrd.gz || goto custom_exit
 echo Booting Debian Installer...
