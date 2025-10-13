@@ -7,7 +7,7 @@
 clear custom_choice
 menu Custom
 item --gap Custom Boot Menu
-item debian Debian 13 Manual Install (x86_64)
+item debian Debian 13 
 item debian Debian 13 UEFI (x86_64)
 item win11_iso ${space} Windows11
 item esxi_70_kickstart ${space} 7.0 Automated Install
