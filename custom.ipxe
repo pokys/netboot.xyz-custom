@@ -19,10 +19,9 @@ goto custom_exit
 
 
 
-:debian12_manual
-set base_url https://deb.debian.org/debian/dists/bookworm/main/installer-amd64/current/images/netboot/debian-installer/amd64
-kernel ${base_url}/linux vga=788 auto=false
-initrd ${base_url}/initrd.gz
+kernel ${base_url}/linux vga=788 auto=false --- || goto custom_exit
+initrd ${base_url}/initrd.gz || goto custom_exit
+echo Booting Debian Installer...
 boot || goto custom_exit
 
 :win11_iso
