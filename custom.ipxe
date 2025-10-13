@@ -21,11 +21,14 @@ goto custom_exit
 
 
 :debian
-echo Bootuji Debian Trixie...
-kernel https://ftp.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-initrd https://ftp.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+set mirror http://ftp.debian.org
+set version trixie
+set arch amd64
+set dir ${mirror}/debian/dists/${version}/main/installer-${arch}/current/images/netboot/debian-installer/amd64
+kernel ${dir}/linux auto=true priority=critical url=${mirror}/debian/dists/${version}/main/installer/amd64/ || goto fail
+initrd ${dir}/initrd.gz
 imgargs linux initrd=initrd
-boot || goto custom_exit
+boot
 
 :debian_uefi
 chain https://ftp.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/grubx64.efi
