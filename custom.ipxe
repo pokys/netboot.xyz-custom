@@ -7,7 +7,7 @@
 clear custom_choice
 menu Custom
 item --gap Custom Boot Menu
-item debian12_manual Debian 12 Manual Install (x86_64)
+item debian Debian 12 Manual Install (x86_64)
 item win11_iso ${space} Windows11
 item esxi_70_kickstart ${space} 7.0 Automated Install
 item esxi_70_install ${space} 7.0 Installer
@@ -18,12 +18,14 @@ goto ${custom_choice}
 goto custom_exit
 
 
-:debian12_manual
-set base_url https://deb.debian.org/debian/dists/bookworm/main/installer-amd64/current/images/netboot/debian-installer/amd64
 
-initrd ${base_url}/initrd.gz || goto custom_exit
-kernel ${base_url}/linux initrd=initrd.gz vga=788 auto=false --- || goto custom_exit
-boot || goto custom_exit
+:debian
+echo Spouštím standardní instalaci Debian Trixie…
+kernel https://ftp.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+initrd https://ftp.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+imgargs linux initrd=initrd auto=true priority=critical \
+    url=http://tvuj.server/path/to/preseed/trixie.seed
+boot || goto fallback
 
 :win11_iso
 sanboot --no-describe --drive 0x80 https://software.download.prss.microsoft.com/dbazure/Win11_23H2_Czech_x64v2.iso?t=fe16418c-ef3d-4ed7-a882-421fe505d8ea&P1=1712743409&P2=601&P3=2&P4=l978gA5qj5Qb98q5uBEG5%2bmMJMRmAar5O7JtLagld7lnPHc540hRFOU3DF2cLkcyy2svNOvvYnYH22szAxcmXut0Ai11EmI9eXjLAHm3jAQZYBvvNb4PvYOh8RyUQckYBj9CEKBZIlBtAcwySF0VGVZ9TWWqHIFGcVvOa049Xzv884pMSwnftwLkkzCFgxh24xGCzpA7f75mG90wXlHryH5i0VF8DBct8g8VHphm6Q3rHI4%2bOHpa1oDpyiJDoLgZcRPBXMYzKNM%2bphxRW%2b%2fmEsQWJF0wTqoDqVm8HrEKYF%2f6UMjXfcpPcmgRM9OmoXzNvCqN5p8EXGdEhIG0O63Ofg%3d%3d || goto custom_exit
