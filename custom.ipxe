@@ -7,8 +7,8 @@
 clear custom_choice
 menu Custom
 item --gap Custom Boot Menu
-item debian_trixie Debian Trixie 13
-item debian_trixie_uefi Debian Trixie UEFI
+item debian_trixie_1 Debian Trixie 1
+item debian_trixie_2 Debian Trixie 2
 item win11_iso ${space} Windows11
 item esxi_70_kickstart ${space} 7.0 Automated Install
 item esxi_70_install ${space} 7.0 Installer
@@ -18,13 +18,13 @@ echo ${cls}
 goto ${custom_choice}
 goto custom_exit
 
-:debian_trixie
+:debian_trixie_1
 set debian_mirror http://cdimage.debian.org/debian-live/current/amd64/iso-hybrid/
 set debian_iso debian-live-12-amd64-xfce.iso
 sanboot --no-describe --drive 0x80 ${debian_mirror}${debian_iso} || goto custom_exit
 
 
-:debian_trixie_uefi
+:debian_trixie_2
 set debian_mirror http://deb.debian.org/debian
 set dir ${debian_mirror}/dists/trixie/main/installer-amd64/current/images/netboot/pxelinux.0
 chain ${dir}
