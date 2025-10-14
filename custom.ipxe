@@ -29,17 +29,13 @@ initrd ${dir}/initrd.gz
 boot || goto custom_exit
 
 :debian_trixie_uefi
-# Netboot.xyz style for Debian Trixie (UEFI)
 set os_arch amd64
 set debian_version trixie
 set debian_mirror http://deb.debian.org/debian
-set debian_base_dir ${debian_mirror}
-set mirrorcfg mirror/suite=${debian_version}
-set dir ${debian_base_dir}/dists/${debian_version}/main/installer-${os_arch}/current/images/netboot/debian-installer/${os_arch}/
+set dir ${debian_mirror}/dists/${debian_version}/main/installer-${os_arch}/current/images/netboot/debian-installer/${os_arch}/
 
-kernel ${dir}/linux ${mirrorcfg} initrd=initrd.gz
+kernel ${dir}/linux vga=788 initrd=initrd.gz
 initrd ${dir}/initrd.gz
-imgargs linux ${mirrorcfg} initrd=initrd.gz
 boot || goto custom_exit
 
 :win11_iso
