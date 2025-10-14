@@ -34,9 +34,9 @@ boot
 
 
 :debian_uefi
-set dir http://deb.debian.org/debian/dists/bookworm/main/installer-amd64/current/images/netboot/debian-installer/amd64/
-kernel ./linux auto=true priority=critical mirror/suite=bookworm -- quiet initrd=initrd.gz
-initrd .//initrd.gz
+kernel http://ftp.cz.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
+initrd http://ftp.cz.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
+imgargs linux initrd=initrd.gz auto=true priority=critical
 boot
 
 :win11_iso
