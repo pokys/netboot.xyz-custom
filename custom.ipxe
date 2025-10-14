@@ -19,16 +19,19 @@ goto ${custom_choice}
 goto custom_exit
 
 
-
 :debian
-set mirror http://ftp.debian.org
-set version trixie
+set install_params auto=true priority=critical
+set mirror http://deb.debian.org
+set base_dir debian
+set debian_version bookworm
 set arch amd64
-set dir ${mirror}/debian/dists/${version}/main/installer-${arch}/current/images/netboot/debian-installer/amd64
-kernel ${dir}/linux auto=true priority=critical url=${mirror}/debian/dists/${version}/main/installer/amd64/ || goto fail
+set mirrorcfg mirror/suite=${debian_version}
+set dir ${mirror}/${base_dir}/dists/${version}/main/installer-${arch}/current/images/netboot/debian-installer/amd64/
+
+kernel ${dir}/linux ${install_params} ${mirrorcfg} -- quiet initrd=initrd.gz
 initrd ${dir}/initrd.gz
-imgargs linux initrd=initrd
 boot
+
 
 :debian_uefi
 chain https://ftp.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/grubx64.efi
