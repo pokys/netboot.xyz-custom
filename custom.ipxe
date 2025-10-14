@@ -19,21 +19,31 @@ goto ${custom_choice}
 goto custom_exit
 
 :debian_trixie
-set mirror http://ftp.cz.debian.org
-set base_dir debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64
-set install_params auto=true priority=critical preseed/url=http://<your-preseed-server>/preseed.cfg
-kernel ${mirror}/${base_dir}/linux ${install_params} initrd=initrd.gz -- quiet
-initrd ${mirror}/${base_dir}/initrd.gz
-boot
+# Netboot.xyz style for Debian Trixie (legacy BIOS/SeaBIOS)
+set os_arch amd64
+set debian_version trixie
+set debian_mirror http://deb.debian.org/debian
+set debian_base_dir ${debian_mirror}
+set mirrorcfg mirror/suite=${debian_version}
+set dir ${debian_base_dir}/dists/${debian_version}/main/installer-${os_arch}/current/images/netboot/debian-installer/${os_arch}/
+
+kernel ${dir}/linux ${mirrorcfg} initrd=initrd.gz
+initrd ${dir}/initrd.gz
+boot || goto custom_exit
 
 :debian_trixie_uefi
-set mirror http://ftp.cz.debian.org
-set base_dir debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64
-set install_params auto=true priority=critical preseed/url=http://<your-preseed-server>/preseed.cfg
-kernel ${mirror}/${base_dir}/linux ${install_params} initrd=initrd.gz -- quiet
-initrd ${mirror}/${base_dir}/initrd.gz
-imgargs linux initrd=initrd.gz
-boot
+# Netboot.xyz style for Debian Trixie (UEFI)
+set os_arch amd64
+set debian_version trixie
+set debian_mirror http://deb.debian.org/debian
+set debian_base_dir ${debian_mirror}
+set mirrorcfg mirror/suite=${debian_version}
+set dir ${debian_base_dir}/dists/${debian_version}/main/installer-${os_arch}/current/images/netboot/debian-installer/${os_arch}/
+
+kernel ${dir}/linux ${mirrorcfg} initrd=initrd.gz
+initrd ${dir}/initrd.gz
+imgargs linux ${mirrorcfg} initrd=initrd.gz
+boot || goto custom_exit
 
 :win11_iso
 sanboot --no-describe --drive 0x80 https://software.download.prss.microsoft.com/dbazure/Win11_23H2_Czech_x64v2.iso?t=fe16418c-ef3d-4ed7-a882-421fe505d8ea&P1=1712743409&P2=601&P3=2&P4=l978gA5qj5Qb98q5uBEG5%2bmMJMRmAar5O7JtLagld7lnPHc540hRFOU3DF2cLkcyy2svNOvvYnYH22szAxcmXut0Ai11EmI9eXjLAHm3jAQZYBvvNb4PvYOh8RyUQckYBj9CEKBZIlBtAcwySF0VGVZ9TWWqHIFGcVvOa049Xzv884pMSwnftwLkkzCFgxh24xGCzpA7f75mG90wXlHryH5i0VF8DBct8g8VHphm6Q3rHI4%2bOHpa1oDpyiJDoLgZcRPBXMYzKNM%2bphxRW%2b%2fmEsQWJF0wTqoDqVm8HrEKYF%2f6UMjXfcpPcmgRM9OmoXzNvCqN5p8EXGdEhIG0O63Ofg%3d%3d || goto custom_exit
