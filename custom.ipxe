@@ -26,7 +26,7 @@ set base_dir debian
 set debian_version bookworm
 set arch amd64
 set mirrorcfg mirror/suite=${debian_version}
-set dir ${mirror}/${base_dir}/dists/${version}/main/installer-${arch}/current/images/netboot/debian-installer/amd64/
+set dir ${mirror}/${base_dir}/dists/${debian_version}/main/installer-${arch}/current/images/netboot/debian-installer/amd64/
 
 kernel ${dir}/linux ${install_params} ${mirrorcfg} -- quiet initrd=initrd.gz
 initrd ${dir}/initrd.gz
