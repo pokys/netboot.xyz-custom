@@ -7,8 +7,8 @@
 clear custom_choice
 menu Custom
 item --gap Custom Boot Menu
-item debian Debian 13 
-item debian Debian 13 UEFI (x86_64)
+item debian_trixie Debian Trixie 
+item debian_trixie_uefi Debian Trixie UEFI
 item win11_iso ${space} Windows11
 item esxi_70_kickstart ${space} 7.0 Automated Install
 item esxi_70_install ${space} 7.0 Installer
@@ -18,25 +18,21 @@ echo ${cls}
 goto ${custom_choice}
 goto custom_exit
 
-
-:debian
-set install_params auto=true priority=critical
-set mirror http://deb.debian.org
-set base_dir debian
-set debian_version bookworm
-set arch amd64
-set mirrorcfg mirror/suite=${debian_version}
-set dir ${mirror}/${base_dir}/dists/${debian_version}/main/installer-${arch}/current/images/netboot/debian-installer/amd64/
-
-kernel ${dir}/linux ${install_params} ${mirrorcfg} -- quiet initrd=initrd.gz
-initrd ${dir}/initrd.gz
+:debian_trixie
+set mirror http://ftp.cz.debian.org
+set base_dir debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64
+set install_params auto=true priority=critical preseed/url=http://<your-preseed-server>/preseed.cfg
+kernel ${mirror}/${base_dir}/linux ${install_params} initrd=initrd.gz -- quiet
+initrd ${mirror}/${base_dir}/initrd.gz
 boot
 
-
-:debian_uefi
-kernel http://ftp.cz.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-initrd http://ftp.cz.debian.org/debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
-imgargs linux initrd=initrd.gz auto=true priority=critical
+:debian_trixie_uefi
+set mirror http://ftp.cz.debian.org
+set base_dir debian/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64
+set install_params auto=true priority=critical preseed/url=http://<your-preseed-server>/preseed.cfg
+kernel ${mirror}/${base_dir}/linux ${install_params} initrd=initrd.gz -- quiet
+initrd ${mirror}/${base_dir}/initrd.gz
+imgargs linux initrd=initrd.gz
 boot
 
 :win11_iso
