@@ -19,17 +19,9 @@ goto ${custom_choice}
 goto custom_exit
 
 :debian_trixie
-set install_params auto=true priority=critical
-set mirror http://deb.debian.org
-set base_dir debian
-set debian_version trixie
-set arch amd64
-set mirrorcfg mirror/suite=${debian_version}
-set dir ${mirror}/${base_dir}/dists/${debian_version}/main/installer-${arch}/current/images/netboot/debian-installer/${arch}/
-
-kernel ${dir}/linux ${install_params} ${mirrorcfg} -- quiet initrd=initrd.gz
-initrd ${dir}/initrd.gz
-boot || goto custom_exit
+set debian_mirror http://deb.debian.org/debian
+set dir ${debian_mirror}/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/
+chain ${dir}/pxelinux.0
 
 :debian_trixie_uefi
 set os_arch amd64
