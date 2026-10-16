@@ -1,0 +1,38 @@
+#!ipxe
+# Prepared from pinned upstream media; see docs/puppy-slax.md.
+
+:slax_menu
+menu Slax Debian 12.2.0 - Live in RAM
+item --gap x86_64 - 2 GB RAM recommended - no persistence
+item --gap Boot assets: pokys/netboot.xyz-custom GitHub release
+item --gap Live ISO: ftp.sh.cvut.cz - Slax mirror
+item slax_boot ${space} Start Slax Debian 12.2.0
+item slax_back ${space} Return to custom menu
+choose --default slax_back slax_choice || goto slax_back
+goto ${slax_choice}
+
+:slax_boot
+iseq ${arch} x86_64 || goto slax_arch
+set slax_assets https://github.com/pokys/netboot.xyz-custom/releases/download/slax-debian-12.2.0-netboot-v1
+imgfree
+echo Boot assets: ${slax_assets}
+echo Live ISO: http://ftp.sh.cvut.cz/slax/Slax-Debian-12.x/slax-64bit-debian-12.2.0.iso
+kernel ${slax_assets}/slax-vmlinuz initrd=slax-initrfs.img vga=normal load_ramdisk=1 prompt_ramdisk=0 rw printk.time=0 from=http://ftp.sh.cvut.cz/slax/Slax-Debian-12.x/slax-64bit-debian-12.2.0.iso toram || goto slax_failed
+initrd ${slax_assets}/slax-initrfs.img || goto slax_failed
+boot || goto slax_failed
+goto slax_menu
+
+:slax_arch
+echo This live image requires x86_64.
+prompt Press any key to return ||
+goto slax_menu
+
+:slax_failed
+echo Live boot failed. Check internet access and available RAM.
+prompt Press any key to return ||
+goto slax_menu
+
+:slax_back
+clear slax_choice
+clear slax_assets
+exit 0

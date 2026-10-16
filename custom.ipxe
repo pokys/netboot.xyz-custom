@@ -17,6 +17,8 @@ item --gap Live tools
 item alpine_docker ${space} Alpine Live - Docker + Dockge + SSH
 item alpine_tailcat ${space} Alpine Live - Tailcat-OneShot
 item ventoy ${space} Ventoy LiveCD - USB installer / updater
+item puppy ${space} Puppy Linux - BookwormPup64
+item slax ${space} Slax - Debian
 choose custom_choice || goto custom_exit
 echo ${cls}
 goto ${custom_choice}
@@ -52,6 +54,14 @@ goto custom
 
 :ventoy
 chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/ventoy.ipxe || goto custom_exit
+goto custom
+
+:puppy
+chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/puppy.ipxe || goto custom_exit
+goto custom
+
+:slax
+chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/slax.ipxe || goto custom_exit
 goto custom
 
 :custom_exit

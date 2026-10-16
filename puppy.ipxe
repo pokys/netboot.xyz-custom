@@ -1,0 +1,36 @@
+#!ipxe
+# Prepared from pinned upstream media; see docs/puppy-slax.md.
+
+:puppy_menu
+menu Puppy Linux - BookwormPup64 10.0.12 - Live in RAM
+item --gap x86_64 - 4 GB RAM recommended - no persistence
+item --gap Assets: pokys/netboot.xyz-custom GitHub release
+item puppy_boot ${space} Start BookwormPup64 10.0.12
+item puppy_back ${space} Return to custom menu
+choose --default puppy_back puppy_choice || goto puppy_back
+goto ${puppy_choice}
+
+:puppy_boot
+iseq ${arch} x86_64 || goto puppy_arch
+set puppy_assets https://github.com/pokys/netboot.xyz-custom/releases/download/puppy-bookworm64-10.0.12-netboot-v1
+imgfree
+echo Boot assets: ${puppy_assets}
+kernel ${puppy_assets}/puppy-vmlinuz initrd=puppy-initrd pfix=ram pmedia=cd || goto puppy_failed
+initrd ${puppy_assets}/puppy-initrd || goto puppy_failed
+boot || goto puppy_failed
+goto puppy_menu
+
+:puppy_arch
+echo This live image requires x86_64.
+prompt Press any key to return ||
+goto puppy_menu
+
+:puppy_failed
+echo Live boot failed. Check internet access and available RAM.
+prompt Press any key to return ||
+goto puppy_menu
+
+:puppy_back
+clear puppy_choice
+clear puppy_assets
+exit 0

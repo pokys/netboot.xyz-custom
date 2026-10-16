@@ -158,3 +158,12 @@ V **Live tools** vyber **Ventoy LiveCD - USB installer / updater**. Oficiální 
 **1.1.18** otevře grafický nástroj pro instalaci/aktualizaci Ventoy na ručně vybraném USB či disku.
 Používá přímo ISO z oficiálního GitHub release, bez vlastního assets serveru.
 [Zdroj, SHA256 a rozsah ověření](docs/ventoy-livecd.md).
+
+## Puppy Linux a Slax
+
+V **Live tools** jsou **Puppy Linux - BookwormPup64 10.0.12** (4 GB RAM)
+a **Slax - Debian 12.2.0** (2 GB RAM). Obě x86_64 distribuce bootují do RAM bez persistence.
+Připravené bootovací soubory jsou v GitHub Releases tohoto repozitáře;
+Slax si navíc načítá ISO z mirroru ČVUT. V původním netboot.xyz tyto dvě distribuce nejsou.
+Obě prostředí prošla bootem až na desktop v QEMU bez disku.
+[Zdroje, příprava a rozsah ověření](docs/puppy-slax.md).
