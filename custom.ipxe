@@ -6,9 +6,6 @@
 :custom
 clear custom_choice
 menu Custom Boot Menu
-item --gap Linux
-item debian_trixie_1 ${space} Debian 13 Trixie - ISO installer
-item debian_trixie_2 ${space} Debian 13 Trixie - Network installer
 item --gap Windows
 item win11_iso ${space} Windows 11 - ISO installer
 item --gap Virtualization
@@ -17,18 +14,6 @@ choose custom_choice || goto custom_exit
 echo ${cls}
 goto ${custom_choice}
 goto custom_exit
-
-:debian_trixie_1
-set debian_mirror https://cdimage.debian.org/debian-cd/current/amd64/iso-cd/
-set debian_iso debian-13.1.0-amd64-netinst.iso
-sanboot --no-describe --drive 0x80 ${debian_mirror}${debian_iso} || goto custom_exit
-
-
-:debian_trixie_2
-set mirror http://ftp.debian.org/debian
-kernel ${mirror}/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/linux
-initrd ${mirror}/dists/trixie/main/installer-amd64/current/images/netboot/debian-installer/amd64/initrd.gz
-boot || goto custom_exit
 
 :win11_iso
 sanboot --no-describe --drive 0x80 http://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_x64FRE_cs-cz.iso || goto custom_exit
