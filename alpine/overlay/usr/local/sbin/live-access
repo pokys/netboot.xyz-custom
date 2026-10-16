@@ -3,7 +3,12 @@ set -eu
 umask 077
 mkdir -p /run/docker-live
 if [ ! -s /run/docker-live/ssh-password ]; then
-    openssl rand -hex 12 > /run/docker-live/ssh-password
+    password=''
+    while [ "${#password}" -lt 8 ]; do
+        password="${password}$(openssl rand -base64 12 | tr -dc 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz23456789')"
+    done
+    printf '%.8s\n' "$password" > /run/docker-live/ssh-password
+    unset password
     printf 'root:%s\n' "$(cat /run/docker-live/ssh-password)" | chpasswd
 fi
 {

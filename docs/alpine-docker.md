@@ -13,7 +13,8 @@ Large image collections/builds still need more RAM.
 
 ## Access
 
-The console prints the assigned IPv4 addresses and a new random SSH password on each boot.
+The console prints the assigned IPv4 addresses and a new random 8-character SSH password on each boot.
+Passwords omit easily confused characters such as `0`, `O`, `1`, `I`, and lowercase `l`.
 
 - SSH: `ssh root@<IP>` on port 22, using the password printed on the console.
 - Dockge: `http://<IP>:5001`; create a Dockge account on first visit.

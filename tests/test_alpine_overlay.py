@@ -35,7 +35,8 @@ class AlpineOverlayTests(unittest.TestCase):
                 self.assertEqual(member.linkname, '/etc/init.d/' + service)
             self.assertIn('etc/runlevels/boot/cgroups', names)
             script = archive.extractfile('usr/local/sbin/live-access').read().decode()
-            self.assertIn('openssl rand -hex 12', script)
+            self.assertIn('openssl rand -base64 12', script)
+            self.assertIn("printf '%.8s\\n'", script)
             self.assertIn('| chpasswd', script)
 
     def test_menu_targets_and_diskless_boot_parameters(self):
