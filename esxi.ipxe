@@ -1,0 +1,93 @@
+#!ipxe
+# ISO URLs verified against the mirror directory on 2026-10-16.
+isset ${esxi_mirror_base_url} || set esxi_mirror_base_url https://mirror.mahanserver.net/VMware/ESXI
+
+:esxi_menu
+clear esxi_choice
+clear esxi_image
+menu VMware ESXi - MahanServer mirror
+item --gap ESXi 8 - standard and vendor installers
+item esxi_8u3 ESXi 8.0 U3 - Standard (24022510)
+item esxi_8u3_dell ESXi 8.0 U3 - Dell A00 (24022510)
+item esxi_8u3_hpe ESXi 8.0 U3 - HPE June 2024 (24022510)
+item esxi_8u1 ESXi 8.0 U1 - Standard (21495797)
+item --gap ESXi 9 - HPE images only on this mirror
+item esxi_9_hpe ESXi 9.0 - HPE June 2025 (24755229)
+item esxi_9_superdome ESXi 9.0 - HPE Superdome Flex (24755229)
+item --gap ESXi 7
+item esxi_7u3f ESXi 7.0 U3f - Standard (20036589)
+item esxi_7u3f_hpe ESXi 7.0 U3f - HPE July 2022 (20036589)
+item --gap ESXi 6 - older hardware
+item esxi_67_hpe ESXi 6.7 U3 - HPE Gen9+ (15160138)
+item esxi_65 ESXi 6.5 U2 - Standard (8294253)
+item esxi_65_hpe ESXi 6.5 U3 - HPE Gen9+ (13932383)
+item esxi_60_hpe ESXi 6.0 U3 - HPE Gen9+ (10719132)
+item --gap ISO SAN boot - firmware compatibility varies
+item esxi_back Return to custom menu
+choose --default esxi_back esxi_choice || goto esxi_back
+goto ${esxi_choice}
+
+:esxi_8u3
+set esxi_image 80u3/VMware-VMvisor-Installer-8.0U3-24022510.x86_64.iso
+goto esxi_boot
+
+:esxi_8u3_dell
+set esxi_image 80u3/VMware-VMvisor-Installer-8.0.0.update03-24022510.x86_64-Dell_Customized-A00.iso
+goto esxi_boot
+
+:esxi_8u3_hpe
+set esxi_image 80u3/VMware-ESXi-8.0.3-24022510-HPE-803.0.0.11.7.0.23-Jun2024.iso
+goto esxi_boot
+
+:esxi_8u1
+set esxi_image 80u1/VMware-VMvisor-Installer-8.0U1-21495797.x86_64.iso
+goto esxi_boot
+
+:esxi_9_hpe
+set esxi_image 9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.29-jun2025.iso
+goto esxi_boot
+
+:esxi_9_superdome
+set esxi_image 9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.20-SuperdomeFlex-June2025.iso
+goto esxi_boot
+
+:esxi_7u3f
+set esxi_image 7.0U3f/VMware-VMvisor-Installer-7.0U3f-20036589.x86_64.iso
+goto esxi_boot
+
+:esxi_7u3f_hpe
+set esxi_image 7.0U3f/VMware-ESXi-7.0.3-20036589-HPE-703.0.0.10.9.1.5-Jul2022.iso
+goto esxi_boot
+
+:esxi_67_hpe
+set esxi_image 6.7.0/VMware-ESXi-6.7.0-Update3-15160138-HPE-Gen9plus-670.U3.10.5.0.48-Dec2019.iso
+goto esxi_boot
+
+:esxi_65
+set esxi_image 6.5.0/VMware-VMvisor-Installer-6.5.0.update02-8294253.x86_64.iso
+goto esxi_boot
+
+:esxi_65_hpe
+set esxi_image 6.5.0/VMware-ESXi-6.5.0-Update3-13932383-HPE-Gen9plus-650.U3.10.4.1.8-Jun2019.iso
+goto esxi_boot
+
+:esxi_60_hpe
+set esxi_image 6.0.0/VMware-ESXi-6.0.0-Update3-10719132-HPE-Gen9plus-600.10.4.0.15-Apr2019.iso
+goto esxi_boot
+
+:esxi_boot
+imgfree
+echo Starting ${esxi_image}
+sanboot --no-describe --drive 0x80 ${esxi_mirror_base_url}/${esxi_image} || goto esxi_failed
+goto esxi_menu
+
+:esxi_failed
+echo ISO boot failed. Check network access and iPXE HTTP(S) SAN support.
+echo If ISO boot fails on this firmware, use extracted ESXi media over HTTP.
+prompt Press any key to return to ESXi menu... ||
+goto esxi_menu
+
+:esxi_back
+clear esxi_choice
+clear esxi_image
+exit 0

@@ -1,0 +1,6 @@
+/.build/
+/artifacts/
+*.wim
+*.iso
+*.esd
+*.vhd*

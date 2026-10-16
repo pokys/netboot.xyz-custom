@@ -10,9 +10,7 @@ item --gap Custom Boot Menu
 item debian_trixie_1 Debian Trixie 1
 item debian_trixie_2 Debian Trixie 2
 item win11_iso ${space} Windows11
-item esxi_70_kickstart ${space} 7.0 Automated Install
-item esxi_70_install ${space} 7.0 Installer
-item esxi_70_iso ${space} 7.0 ISO
+item esxi ${space} VMware ESXi - MahanServer mirror
 choose custom_choice || goto custom_exit
 echo ${cls}
 goto ${custom_choice}
@@ -34,17 +32,9 @@ boot || goto custom_exit
 sanboot --no-describe --drive 0x80 http://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_x64FRE_cs-cz.iso || goto custom_exit
 boot || goto custom_exit
 
-:esxi_70_iso
-sanboot --no-describe --drive 0x80 http://boot.codybunch.lab/ISO/VMware/ESXi/v7.0.0U1d/ESXi-7.0U1d-17551050-standard-customized.iso || goto custom_exit
-boot || goto custom_exit
-
-:esxi_70_install
-kernel http://boot.codybunch.lab/VMware/ESXi/v7.0.0U1d/mboot.c32 -c http://boot.codybunch.lab/VMware/ESXi/v7.0.0U1d/boot-70.cfg
-boot || goto custom_exit
-
-:esxi_70_kickstart
-kernel http://boot.codybunch.lab/VMware/ESXi/v7.0.0U1d/mboot.c32 -c http://boot.codybunch.lab/VMware/ESXi/v7.0.0U1d/boot-70-ks.cfg
-boot || goto custom_exit
+:esxi
+chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/esxi.ipxe || goto custom_exit
+goto custom
 
 :custom_exit
 echo Boot failed. Returning to menu
