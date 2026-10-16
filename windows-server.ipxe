@@ -8,6 +8,9 @@ item --gap Official Microsoft ISO - English x64 - 180-day Evaluation
 item server_2025 ${space} Windows Server 2025 - Evaluation - EN - Microsoft
 item server_2022 ${space} Windows Server 2022 - Evaluation - EN - Microsoft
 item server_2019 ${space} Windows Server 2019 - Evaluation - EN - Microsoft
+item server_2016 ${space} Windows Server 2016 - Evaluation - EN - Microsoft
+item server_essentials_2019 ${space} Windows Server 2019 Essentials - Evaluation - EN - Microsoft
+item server_essentials_2016 ${space} Windows Server 2016 Essentials - Evaluation - EN - Microsoft
 item server_back ${space} Return to custom menu
 choose --default server_back server_choice || goto server_back
 goto ${server_choice}
@@ -27,12 +30,27 @@ set server_image Windows Server 2019 Evaluation - EN x64
 set server_url https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66749/17763.3650.221105-1748.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso
 goto server_boot
 
+:server_2016
+set server_image Windows Server 2016 Evaluation - EN x64
+set server_url https://software-static.download.prss.microsoft.com/pr/download/Windows_Server_2016_Datacenter_EVAL_en-us_14393_refresh.ISO
+goto server_boot
+
+:server_essentials_2019
+set server_image Windows Server 2019 Essentials Evaluation - EN x64
+set server_url https://software-static.download.prss.microsoft.com/pr/download/17763.737.190906-2324.rs5_release_svc_refresh_SERVERESSENTIALS_OEM_x64FRE_en-us_1.iso
+goto server_boot
+
+:server_essentials_2016
+set server_image Windows Server 2016 Essentials Evaluation - EN x64
+set server_url https://download.microsoft.com/download/6/9/5/6957BB28-1FAD-4E62-B161-F873196130BD/14393.0.161119-1705.RS1_REFRESH_SERVERESSENTIALS_OEM_X64FRE_EN-US.ISO
+goto server_boot
+
 :server_boot
 imgfree
 echo ${server_image}
-echo Source: Microsoft - software-static.download.prss.microsoft.com
+echo Source: Microsoft
 echo URL: ${server_url}
-echo Select Standard or Datacenter, Core or Desktop Experience in Windows Setup.
+echo Select the edition and installation options available in Windows Setup.
 sanboot --no-describe --drive 0x80 ${server_url} || goto server_failed
 goto server_menu
 

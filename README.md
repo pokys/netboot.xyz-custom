@@ -13,6 +13,23 @@ will cause a custom menu to appear in the main menu.
 
 If you are new to iPXE scripting, take a look at `custom.ipxe.example` and build up from that.
 
+## Windows Evaluation installer menu
+
+Položka **Windows 11 - Microsoft Evaluation** nabízí anglické x64 obrazy:
+
+- Windows 11 Enterprise Evaluation
+- Windows 11 Enterprise LTSC 2024 Evaluation
+- Windows 11 IoT Enterprise LTSC 2024 Evaluation
+
+Jde o **90denní Evaluation**. Submenu Windows Server je doplněné o **Server 2016** a **Server Essentials 2019 / 2016**,
+vše jako **180denní Evaluation, EN x64**. Essentials nabízí jiné edice/volby než Standard/Datacenter ISO.
+Všechny nové URL pocházejí z Microsoft Evaluation Center a prošly 16. 10. 2026 kontrolou HTTP Range + ISO9660.
+[Seznam nových obrazů a oficiálních zdrojů](docs/windows-evaluation.md).
+
+Menu vypisuje zdroj a URL, při chybě nabízí opakování a návrat. Používá přímý ISO `sanboot`.
+Funkčnost síťového bootu ani instalace není ověřená; podle firmwaru a Windows Setup může být potřeba
+WinPE/wimboot se samostatným instalačním zdrojem. Menu nespouští bezobslužnou instalaci.
+
 ## Windows Server installer menu
 
 V custom menu vyber **Windows Server - Microsoft Evaluation**. K dispozici jsou anglické x64 ISO:

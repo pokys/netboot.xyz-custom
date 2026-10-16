@@ -1,0 +1,52 @@
+#!ipxe
+# Official Microsoft Evaluation Center ISO links, reviewed 2026-10-16.
+# English x64, 90-day Evaluation. Network boot and full hashes are untested.
+
+:eval_menu
+menu Windows 11 - Microsoft Evaluation
+item --gap Official Microsoft ISO - English x64 - 90-day Evaluation
+item eval_enterprise ${space} Windows 11 Enterprise - Eval - EN
+item eval_ltsc ${space} Windows 11 Enterprise LTSC 2024 - Eval - EN
+item eval_iot ${space} Windows 11 IoT Enterprise LTSC 2024 - Eval - EN
+item eval_back ${space} Return to custom menu
+choose --default eval_back eval_choice || goto eval_back
+goto ${eval_choice}
+
+:eval_enterprise
+set eval_image Windows 11 Enterprise Evaluation - EN x64
+set eval_url https://software-static.download.prss.microsoft.com/dbazure/26300.9457.260913-1737.26h2_ge_release_svc_refresh_CLIENTENTERPRISEEVAL_OEMRET_x64FRE_en-us.iso
+goto eval_boot
+
+:eval_ltsc
+set eval_image Windows 11 Enterprise LTSC 2024 Evaluation - EN x64
+set eval_url https://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240906-0331.ge_release_svc_refresh_CLIENT_LTSC_EVAL_x64FRE_en-us.iso
+goto eval_boot
+
+:eval_iot
+set eval_image Windows 11 IoT Enterprise LTSC 2024 Evaluation - EN x64
+set eval_url https://software-static.download.prss.microsoft.com/dbazure/998969d5-f34g-4e03-ac9d-1f9786c66749/26100.1742.240906-0331.ge_release_svc_refresh_CLIENT_IOT_LTSC_EVAL_x64FRE_en-us.iso
+goto eval_boot
+
+:eval_boot
+imgfree
+echo ${eval_image}
+echo Source: Microsoft
+echo URL: ${eval_url}
+sanboot --no-describe --drive 0x80 ${eval_url} || goto eval_failed
+goto eval_menu
+
+:eval_failed
+echo ISO boot failed. Check HTTP(S) access and firmware compatibility.
+echo Windows Setup may require WinPE/wimboot and a separate installation source.
+menu Windows 11 - Download or boot failed
+item eval_boot ${space} Retry this ISO
+item eval_menu ${space} Return to Windows 11 Evaluation
+item eval_back ${space} Return to custom menu
+choose --default eval_menu eval_choice || goto eval_menu
+goto ${eval_choice}
+
+:eval_back
+clear eval_choice
+clear eval_image
+clear eval_url
+exit 0
