@@ -4,3 +4,5 @@
 *.iso
 *.esd
 *.vhd*
+__pycache__/
+*.pyc

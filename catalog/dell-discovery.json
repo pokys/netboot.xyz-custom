@@ -1,0 +1,471 @@
+{
+  "pages": [
+    "poweredge-c1100.html",
+    "poweredge-c2100.html",
+    "poweredge-c410x.html",
+    "poweredge-c4130.html",
+    "poweredge-c4140.html",
+    "poweredge-c5000.html",
+    "poweredge-c5125.html",
+    "poweredge-c5220.html",
+    "poweredge-c5230.html",
+    "poweredge-c6100.html",
+    "poweredge-c6105.html",
+    "poweredge-c6145.html",
+    "poweredge-c6220-2.html",
+    "poweredge-c6220.html",
+    "poweredge-c6300.html",
+    "poweredge-c6320.html",
+    "poweredge-c6320p.html",
+    "poweredge-c6400.html",
+    "poweredge-c6420.html",
+    "poweredge-c6525.html",
+    "poweredge-c8000.html",
+    "poweredge-m1000e.html",
+    "poweredge-m420.html",
+    "poweredge-m520.html",
+    "poweredge-m520p.html",
+    "poweredge-m600.html",
+    "poweredge-m605.html",
+    "poweredge-m610.html",
+    "poweredge-m610x.html",
+    "poweredge-m620.html",
+    "poweredge-m620p.html",
+    "poweredge-m630.html",
+    "poweredge-m630p.html",
+    "poweredge-m640.html",
+    "poweredge-m640p.html",
+    "poweredge-m710.html",
+    "poweredge-m710hd.html",
+    "poweredge-m805.html",
+    "poweredge-m820.html",
+    "poweredge-m820p.html",
+    "poweredge-m830.html",
+    "poweredge-m830p.html",
+    "poweredge-m905.html",
+    "poweredge-m910.html",
+    "poweredge-m915.html",
+    "poweredge-r200.html",
+    "poweredge-r210-2.html",
+    "poweredge-r210.html",
+    "poweredge-r220.html",
+    "poweredge-r230.html",
+    "poweredge-r240.html",
+    "poweredge-r300.html",
+    "poweredge-r310.html",
+    "poweredge-r320.html",
+    "poweredge-r330.html",
+    "poweredge-r340.html",
+    "poweredge-r410.html",
+    "poweredge-r415.html",
+    "poweredge-r420.html",
+    "poweredge-r420xr.html",
+    "poweredge-r430.html",
+    "poweredge-r440.html",
+    "poweredge-r510.html",
+    "poweredge-r515.html",
+    "poweredge-r520.html",
+    "poweredge-r530.html",
+    "poweredge-r530xd.html",
+    "poweredge-r540.html",
+    "poweredge-r610.html",
+    "poweredge-r620.html",
+    "poweredge-r630-dsms.html",
+    "poweredge-r630.html",
+    "poweredge-r640.html",
+    "poweredge-r6415.html",
+    "poweredge-r6515.html",
+    "poweredge-r6525.html",
+    "poweredge-r710.html",
+    "poweredge-r715.html",
+    "poweredge-r720.html",
+    "poweredge-r720xd.html",
+    "poweredge-r730-dsms.html",
+    "poweredge-r730.html",
+    "poweredge-r730xd.html",
+    "poweredge-r740.html",
+    "poweredge-r740xd.html",
+    "poweredge-r740xd2.html",
+    "poweredge-r7415.html",
+    "poweredge-r7425.html",
+    "poweredge-r7515.html",
+    "poweredge-r805.html",
+    "poweredge-r810.html",
+    "poweredge-r815.html",
+    "poweredge-r820.html",
+    "poweredge-r830.html",
+    "poweredge-r840.html",
+    "poweredge-r900.html",
+    "poweredge-r905.html",
+    "poweredge-r910.html",
+    "poweredge-r920.html",
+    "poweredge-r930.html",
+    "poweredge-r940.html",
+    "poweredge-r940xa.html",
+    "poweredge-t100.html",
+    "poweredge-t105.html",
+    "poweredge-t110-2.html",
+    "poweredge-t110.html",
+    "poweredge-t130.html",
+    "poweredge-t140.html",
+    "poweredge-t20.html",
+    "poweredge-t30.html",
+    "poweredge-t300.html",
+    "poweredge-t310.html",
+    "poweredge-t320.html",
+    "poweredge-t330.html",
+    "poweredge-t340.html",
+    "poweredge-t40.html",
+    "poweredge-t410.html",
+    "poweredge-t420.html",
+    "poweredge-t430.html",
+    "poweredge-t440.html",
+    "poweredge-t605.html",
+    "poweredge-t610.html",
+    "poweredge-t620.html",
+    "poweredge-t630.html",
+    "poweredge-t640.html",
+    "poweredge-t710.html",
+    "vmware-esx-4.html",
+    "vmware-esx-server.html",
+    "vmware-esxi-4.x.html",
+    "vmware-esxi-5.html",
+    "vmware-esxi-6.5.x.html",
+    "vmware-esxi-6.7.x.html",
+    "vmware-esxi-6.x.html",
+    "vmware-esxi.html",
+    "vmware-vsan-poweredge.html",
+    "vmware-vsphere-cli.html",
+    "vmware-vsphere-client-plug-ins.html",
+    "vmware-vsphere-guest-software-development-kit.html",
+    "vmware-vsphere-management-assistant.html",
+    "vmware-vsphere-powercli.html",
+    "vmware-vsphere-software-development-kit-for-perl.html",
+    "vmware-vsphere-web-access.html",
+    "vmware-vsphere-web-services-software-development-kit.html",
+    "vmware-vsphere.html"
+  ],
+  "failures": [],
+  "reviewed_date": "2026-10-16",
+  "index_source": "https://downloads.dell.com/published/Pages/index.html",
+  "support_pages": [
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=01dyg",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=1f2n3",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=1gcf7",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=1rt24",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=29kfj",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=2tw0w",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=3hd96",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=4ntx8",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=4wy2y",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=6ydx5",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=7d6gj",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=7frh8",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=7h1h8",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=7hvtf",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=7p3fd",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=86vxk",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=8p3n9",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=9tkg3",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=c3nwc",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=c50rm",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=c6y14",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ckc15",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ckmpc",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=cpj92",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=cpk5d",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=fgcnv",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ft9m9",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=fv770",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=g02pd",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=g91rp",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=gv8d3",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=hcwpf",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=hxj49",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=j10f8",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=j7nd1",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=k4pvh",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=kd8xt",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=kry5m",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ky9xx",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=m2f0f",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=m5try",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=md1yx",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=mnwv4",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=n5c9x",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ngtn9",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=p2jv2",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=pk7wn",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=rd79d",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=rn82n",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=t0gdr",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=t7chv",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=th0gk",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=twtv6",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=v0yt3",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=v9wrp",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=vd7g6",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=vjg1r",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=w50wd",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=wknkd",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=wmkw8",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=y29pf",
+      "found": 0,
+      "note": "No public ISO link returned"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=yvydj",
+      "found": 1,
+      "note": "ISO link found"
+    },
+    {
+      "source": "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ywdf8",
+      "found": 1,
+      "note": "ISO link found"
+    }
+  ],
+  "scope": "All ESXi ISO links in 144 matching public Dell published product indexes plus the listed Dell Support driver pages. This is not a complete inventory of account-only Broadcom releases.",
+  "published_index_iso_urls": 142,
+  "published_index_unique_filenames": 141
+}
