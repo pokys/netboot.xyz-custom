@@ -1,0 +1,52 @@
+#!/bin/sh
+# Runs on the active local/serial console after OpenRC has finished booting.
+set -u
+export HOME=/root USER=root LOGNAME=root
+export TERM=${TERM:-linux}
+export LANG=C.UTF-8
+umask 077
+trap ':' INT
+
+prepare_tailcat() {
+    mkdir -p /opt/tailcat
+    if [ -s /opt/tailcat/Tailcat_OneShot.sh ]; then
+        return 0
+    fi
+    download=/opt/tailcat/Tailcat_OneShot.sh.download.$$
+    echo 'Downloading the reviewed Tailcat-OneShot script...'
+    if ! curl -fL --connect-timeout 15 --max-time 120 --retry 2 \
+        https://raw.githubusercontent.com/pokys/Tailcat-OneShot/b6f66419a2971e01f3db4f2959551950006b9bac/Tailcat_OneShot.sh \
+        -o "$download"; then
+        rm -f "$download"
+        return 1
+    fi
+    if ! printf '%s  %s\n' \
+        7f65d6de7d43466b6d7f7eba781568599c81943f60ab1af7120f661e8ea72d4d \
+        "$download" | sha256sum -c -; then
+        rm -f "$download"
+        return 1
+    fi
+    mv "$download" /opt/tailcat/Tailcat_OneShot.sh
+}
+
+while :; do
+    printf '\nAlpine Live - interactive Tailcat-OneShot\n'
+    printf 'This system runs in RAM. Select a Tailcat mode to start a session.\n\n'
+    if prepare_tailcat; then
+        /bin/sh /opt/tailcat/Tailcat_OneShot.sh
+        status=$?
+        printf '\nTailcat-OneShot finished (exit %s).\n' "$status"
+    else
+        printf '\nTailcat-OneShot download/verification failed. Check networking.\n' >&2
+    fi
+    while :; do
+        printf '[Enter] Open Tailcat again   [s] Shell   [r] Reboot   [p] Power off\n> '
+        IFS= read -r choice || { sleep 2; continue; }
+        case "$choice" in
+            '') break ;;
+            s|S) /bin/sh -l ;;
+            r|R) /sbin/reboot ;;
+            p|P) /sbin/poweroff ;;
+        esac
+    done
+done

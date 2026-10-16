@@ -1,0 +1,4 @@
+alpine-base
+ca-certificates
+curl
+libqrencode-tools

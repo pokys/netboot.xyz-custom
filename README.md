@@ -13,6 +13,17 @@ will cause a custom menu to appear in the main menu.
 
 If you are new to iPXE scripting, take a look at `custom.ipxe.example` and build up from that.
 
+## Alpine Live - Tailcat-OneShot
+
+V sekci **Live tools** vyber **Alpine Live - Tailcat-OneShot**. Samostatný profil nabootuje do RAM
+a rovnou otevře interaktivní konzolové menu **SERVER / CLIENT / FORWARD** z [Tailcat-OneShot](https://github.com/pokys/Tailcat-OneShot).
+Režim spojení vybíráš ručně. Součástí je i nástroj pro volitelný QR kód v režimu SERVER.
+
+K dispozici je **Alpine 3.24 / Latest stable** a **DHCP / Static IPv4**, doporučené jsou **2 GB RAM**.
+Skript je připnutý na ověřený commit a při stažení se kontroluje jeho SHA256. Všechny soubory jsou dočasné.
+Po ukončení helperu lze otevřít menu znovu, přejít do shellu, restartovat nebo vypnout VM.
+[Podrobnosti, zdroje a ověření](docs/alpine-tailcat.md).
+
 ## Alpine Live - Docker + Dockge + SSH
 
 V sekci **Live tools** vyber **Alpine Live - Docker + Dockge + SSH**, potom pevnou větev **Alpine 3.24**

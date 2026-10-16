@@ -1,0 +1,89 @@
+#!ipxe
+# Alpine diskless Tailcat-OneShot. Everything is stored in RAM.
+
+:alpine_tailcat_menu
+menu Alpine Live - Tailcat-OneShot
+item --gap Temporary x86_64 environment - 2 GB RAM recommended
+item alpine_tailcat_pinned ${space} Alpine 3.24 - Fixed release branch
+item alpine_tailcat_latest ${space} Alpine Latest stable - Follow current stable release
+item alpine_tailcat_back ${space} Return to custom menu
+choose --default alpine_tailcat_back alpine_tailcat_choice || goto alpine_tailcat_back
+goto ${alpine_tailcat_choice}
+
+:alpine_tailcat_pinned
+set alpine_live_branch v3.24
+goto alpine_tailcat_network
+
+:alpine_tailcat_latest
+set alpine_live_branch latest-stable
+goto alpine_tailcat_network
+
+:alpine_tailcat_network
+menu Alpine ${alpine_live_branch} - Tailcat-OneShot
+item alpine_tailcat_dhcp ${space} Start Alpine Tailcat Live - DHCP
+item alpine_tailcat_static ${space} Start Alpine Tailcat Live - Static IPv4
+item alpine_tailcat_menu ${space} Back to Alpine versions
+choose --default alpine_tailcat_menu alpine_tailcat_choice || goto alpine_tailcat_menu
+goto ${alpine_tailcat_choice}
+
+:alpine_tailcat_dhcp
+set alpine_live_ipparam ip=dhcp
+goto alpine_tailcat_boot
+
+:alpine_tailcat_static
+echo Enter the IPv4 settings for the live Alpine system.
+echo Use a dotted subnet mask, for example 255.255.255.0.
+echo -n IPv4 address: ${}
+read alpine_static_ip:ipv4 || goto alpine_tailcat_static_invalid
+echo -n Subnet mask: ${}
+read alpine_static_mask:ipv4 || goto alpine_tailcat_static_invalid
+echo -n Gateway: ${}
+read alpine_static_gateway:ipv4 || goto alpine_tailcat_static_invalid
+echo -n DNS server: ${}
+read alpine_static_dns:ipv4 || goto alpine_tailcat_static_invalid
+isset ${alpine_static_ip:ipv4} && isset ${alpine_static_mask:ipv4} && isset ${alpine_static_gateway:ipv4} && isset ${alpine_static_dns:ipv4} || goto alpine_tailcat_static_invalid
+echo Alpine IP: ${alpine_static_ip:ipv4} / ${alpine_static_mask:ipv4}
+echo Gateway: ${alpine_static_gateway:ipv4} - DNS: ${alpine_static_dns:ipv4}
+prompt Press Enter to boot, or Escape to return || goto alpine_tailcat_menu
+set alpine_live_ipparam ip=${alpine_static_ip:ipv4}::${alpine_static_gateway:ipv4}:${alpine_static_mask:ipv4}:::none:${alpine_static_dns:ipv4}
+goto alpine_tailcat_boot
+
+:alpine_tailcat_static_invalid
+echo Invalid or incomplete IPv4 settings.
+prompt Press any key to return ||
+goto alpine_tailcat_menu
+
+:alpine_tailcat_boot
+iseq ${arch} x86_64 || goto alpine_tailcat_arch
+set alpine_live_base https://dl-cdn.alpinelinux.org/alpine/${alpine_live_branch}/releases/x86_64/netboot
+set alpine_live_repo https://dl-cdn.alpinelinux.org/alpine/${alpine_live_branch}/main,https://dl-cdn.alpinelinux.org/alpine/${alpine_live_branch}/community
+set alpine_live_overlay https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/alpine/tailcat-live.apkovl.tar.gz
+imgfree
+kernel ${alpine_live_base}/vmlinuz-lts ${alpine_live_ipparam} BOOTIF=01-${netX/mac:hexhyp} modules=loop,squashfs alpine_repo=${alpine_live_repo} modloop=${alpine_live_base}/modloop-lts apkovl=${alpine_live_overlay} rootflags=size=85% nomodeset || goto alpine_tailcat_failed
+initrd ${alpine_live_base}/initramfs-lts || goto alpine_tailcat_failed
+echo Starting Alpine. The interactive Tailcat-OneShot menu will open on the console.
+boot || goto alpine_tailcat_failed
+goto alpine_tailcat_menu
+
+:alpine_tailcat_arch
+echo This profile requires x86_64.
+prompt Press any key to return ||
+goto alpine_tailcat_menu
+
+:alpine_tailcat_failed
+echo Alpine download or boot failed. Check network access and available RAM.
+prompt Press any key to return ||
+goto alpine_tailcat_menu
+
+:alpine_tailcat_back
+clear alpine_tailcat_choice
+clear alpine_live_base
+clear alpine_live_repo
+clear alpine_live_overlay
+clear alpine_live_ipparam
+clear alpine_live_branch
+clear alpine_static_ip
+clear alpine_static_mask
+clear alpine_static_gateway
+clear alpine_static_dns
+exit 0
