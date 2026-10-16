@@ -1,16 +1,18 @@
 #!ipxe
 ###
-### custom menu example
+### netboot.xyz custom boot menu
 ###
 
 :custom
 clear custom_choice
-menu Custom
-item --gap Custom Boot Menu
-item debian_trixie_1 Debian Trixie 1
-item debian_trixie_2 Debian Trixie 2
-item win11_iso ${space} Windows11
-item esxi ${space} VMware ESXi - MahanServer mirror
+menu Custom Boot Menu
+item --gap Linux
+item debian_trixie_1 ${space} Debian 13 Trixie - ISO installer
+item debian_trixie_2 ${space} Debian 13 Trixie - Network installer
+item --gap Windows
+item win11_iso ${space} Windows 11 - ISO installer
+item --gap Virtualization
+item esxi ${space} VMware ESXi - Select version
 choose custom_choice || goto custom_exit
 echo ${cls}
 goto ${custom_choice}
