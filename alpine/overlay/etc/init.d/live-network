@@ -1,0 +1,14 @@
+#!/sbin/openrc-run
+description="Keep the selected live boot network settings in OpenRC"
+
+depend() {
+    need localmount
+    after modules
+    before networking
+}
+
+start() {
+    ebegin "Applying live boot network configuration"
+    /usr/local/sbin/live-network
+    eend $?
+}

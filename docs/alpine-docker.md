@@ -1,10 +1,17 @@
 # Alpine Live: Docker + Dockge + SSH
 
-Choose **Live tools → Alpine Live - Docker + Dockge + SSH**, then **Start Alpine Docker Live**.
+Choose **Live tools → Alpine Live - Docker + Dockge + SSH**, then start with **DHCP** or **Static IPv4**.
 The profile boots Alpine v3.24 x86_64 directly from its official netboot kernel/initramfs and loads
-this repository's small configuration archive. DHCP and internet access are required.
+this repository's small configuration archive. Internet access is required.
 Docker packages are downloaded from Alpine main/community; Dockge is pulled from Docker Hub.
 Allow a few minutes for the first startup, depending on the network and CPU.
+
+Static IPv4 prompts for address, dotted subnet mask (for example `255.255.255.0`), gateway and one DNS server.
+These settings apply to Alpine on the same network card used by iPXE. The menu downloads boot files
+using iPXE's existing network connection; Alpine switches to the entered settings in initramfs and keeps
+them when OpenRC starts networking. The static address must be reachable through the selected card/network.
+Returning to the menu and choosing DHCP starts a fresh DHCP configuration instead.
+Addresses are entered at boot and are never committed to the configuration archive.
 
 Use **8 GB RAM or more** for useful container workloads. The root filesystem may use up to 85% of RAM;
 that space is shared with package files, Docker images, layers, logs, and volumes.
@@ -59,6 +66,9 @@ test copy of the archive/modloop. Root was confirmed as tmpfs, Docker used overl
 container ran successfully, SSH password authentication worked, and Dockge reported healthy with
 HTTP 200 from its web interface. Docker Compose configuration and all three services were checked.
 The final iPXE chain and physical BIOS/UEFI hardware still need a real netboot test.
+The static IPv4 path was also booted in QEMU: address, gateway, DNS, SSH and Dockge were checked,
+and the address remained static after restarting networking. A separate DHCP boot verified the original path.
+The interactive iPXE input prompts still need verification in the user's boot menu.
 
 ## Sources
 

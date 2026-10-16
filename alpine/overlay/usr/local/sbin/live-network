@@ -1,0 +1,49 @@
+#!/bin/sh
+set -eu
+
+ip_config=dhcp
+boot_mac=''
+for option in $(cat /proc/cmdline); do
+    case "$option" in
+        ip=*) ip_config=${option#ip=} ;;
+        BOOTIF=*) boot_mac=$(printf '%s' "${option#BOOTIF=01-}" | tr 'A-F-' 'a-f:') ;;
+    esac
+done
+
+iface=eth0
+if [ -n "$boot_mac" ]; then
+    iface=''
+    for address in /sys/class/net/*/address; do
+        if [ "$(cat "$address")" = "$boot_mac" ]; then
+            iface=${address%/address}
+            iface=${iface##*/}
+            break
+        fi
+    done
+    [ -n "$iface" ] || { echo 'Boot network interface was not found' >&2; exit 1; }
+fi
+
+if [ "$ip_config" = dhcp ]; then
+    printf 'auto lo\niface lo inet loopback\n\nauto %s\niface %s inet dhcp\n' "$iface" "$iface" > /etc/network/interfaces
+    exit 0
+fi
+
+# Same ip= layout used by Alpine's initramfs: client:server:gateway:mask:host:device:autoconf:dns.
+old_ifs=$IFS
+IFS=:
+read -r address server gateway mask hostname device autoconf dns extra <<EOF
+$ip_config
+EOF
+IFS=$old_ifs
+[ "$autoconf" = none ] || { echo 'Unsupported live network configuration' >&2; exit 1; }
+for value in "$address" "$gateway" "$mask" "$dns"; do
+    printf '%s\n' "$value" | awk -F. 'NF!=4 {exit 1} {for(i=1;i<=4;i++) if($i!~/^[0-9]+$/ || $i>255) exit 1}' || {
+        echo 'Invalid live IPv4 configuration' >&2
+        exit 1
+    }
+done
+{
+    printf 'auto lo\niface lo inet loopback\n\nauto %s\niface %s inet static\n' "$iface" "$iface"
+    printf '    address %s\n    netmask %s\n    gateway %s\n' "$address" "$mask" "$gateway"
+} > /etc/network/interfaces
+printf 'nameserver %s\n' "$dns" > /etc/resolv.conf

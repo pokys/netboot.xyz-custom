@@ -10,7 +10,7 @@ SOURCE = ROOT / 'alpine' / 'overlay'
 OUTPUT = ROOT / 'alpine' / 'docker-live.apkovl.tar.gz'
 SERVICES = {
     'sysinit': ('devfs', 'dmesg', 'mdev', 'hwdrivers', 'modloop'),
-    'boot': ('modules', 'sysctl', 'hostname', 'bootmisc', 'syslog', 'networking', 'cgroups'),
+    'boot': ('modules', 'sysctl', 'hostname', 'bootmisc', 'syslog', 'live-network', 'networking', 'cgroups'),
     'default': ('live-access', 'sshd', 'docker', 'dockge-live'),
     'shutdown': ('mount-ro', 'killprocs'),
 }
