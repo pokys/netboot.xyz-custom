@@ -1,7 +1,8 @@
 # Alpine Live: Docker + Dockge + SSH
 
-Choose **Live tools → Alpine Live - Docker + Dockge + SSH**, then start with **DHCP** or **Static IPv4**.
-The profile boots Alpine v3.24 x86_64 directly from its official netboot kernel/initramfs and loads
+Choose **Live tools → Alpine Live - Docker + Dockge + SSH**, select **Alpine 3.24** or **Latest stable**,
+then start with **DHCP** or **Static IPv4**.
+The profile boots Alpine x86_64 directly from its official netboot kernel/initramfs and loads
 this repository's small configuration archive. Internet access is required.
 Docker packages are downloaded from Alpine main/community; Dockge is pulled from Docker Hub.
 Allow a few minutes for the first startup, depending on the network and CPU.
@@ -52,7 +53,13 @@ python -m unittest discover -s tests
 
 Commit both source changes and `alpine/docker-live.apkovl.tar.gz`. The archive contains configuration
 and startup scripts only, with deterministic root ownership and timestamps; no personal filesystem metadata.
-The Docker/Compose versions follow Alpine's stable v3.24 repositories. Dockge's upstream `:1` image
+Alpine 3.24 stays on the v3.24 release branch (including updates within that branch).
+Latest stable follows Alpine's `latest-stable` alias, including future stable release branches.
+The kernel, initramfs, modloop and main/community repositories all use the selected branch.
+The configuration archive does not preseed `/etc/apk/repositories`; Alpine initramfs generates it
+from the selected `alpine_repo=` boot parameter, so later APK operations use that same branch.
+Future Alpine releases can change packages/behavior; the fixed branch remains available as a fallback.
+Dockge's upstream `:1` image
 is pinned by manifest digest in `compose.yaml`; update the digest deliberately when upgrading.
 
 The main menu and `alpine-docker.ipxe` point at files on the `master` branch of this repository.
@@ -69,6 +76,9 @@ The final iPXE chain and physical BIOS/UEFI hardware still need a real netboot t
 The static IPv4 path was also booted in QEMU: address, gateway, DNS, SSH and Dockge were checked,
 and the address remained static after restarting networking. A separate DHCP boot verified the original path.
 The interactive iPXE input prompts still need verification in the user's boot menu.
+Latest stable was separately booted with its official kernel, initramfs, modloop and package repositories.
+The generated repository configuration contained only latest-stable main/community; SSH, Docker and Dockge's
+HTTP interface were verified after startup.
 
 ## Sources
 

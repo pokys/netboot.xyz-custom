@@ -59,6 +59,16 @@ class AlpineOverlayTests(unittest.TestCase):
         self.assertNotIn('root=/dev/', menu)
         self.assertNotIn('setup-disk', menu)
 
+    def test_selected_branch_supplies_all_boot_files_and_repositories(self):
+        menu = (ROOT / 'alpine-docker.ipxe').read_text()
+        self.assertIn('set alpine_live_branch v3.24', menu)
+        self.assertIn('set alpine_live_branch latest-stable', menu)
+        self.assertIn('/${alpine_live_branch}/releases/x86_64/netboot', menu)
+        self.assertIn('/${alpine_live_branch}/main,https://dl-cdn.alpinelinux.org/alpine/${alpine_live_branch}/community', menu)
+        with tarfile.open(fileobj=io.BytesIO(builder.build()), mode='r:gz') as archive:
+            # Alpine initramfs generates this file from alpine_repo= when not preseeded.
+            self.assertNotIn('etc/apk/repositories', archive.getnames())
+
 
 if __name__ == '__main__':
     unittest.main()

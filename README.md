@@ -15,8 +15,11 @@ If you are new to iPXE scripting, take a look at `custom.ipxe.example` and build
 
 ## Alpine Live - Docker + Dockge + SSH
 
-V sekci **Live tools** vyber **Alpine Live - Docker + Dockge + SSH**. Profil nabootuje Alpine v3.24 x86_64
-do RAM, připraví Docker a Compose, spustí Dockge a SSH. Potřebuje DHCP, internet a doporučeně alespoň **8 GB RAM**.
+V sekci **Live tools** vyber **Alpine Live - Docker + Dockge + SSH**, potom pevnou větev **Alpine 3.24**
+nebo **Latest stable** a síť přes **DHCP / Static IPv4**. Profil běží v RAM, připraví Docker a Compose,
+spustí Dockge a SSH. Potřebuje internet a doporučeně alespoň **8 GB RAM**.
+Latest stable používá aktuální stabilní větev Alpine pro kernel, initramfs, modloop i repozitáře balíčků;
+Alpine 3.24 zůstává dostupné jako pevná větev.
 
 - **Dockge:** `http://<IP>:5001`, účet vytvoříš při prvním otevření.
 - **SSH:** `ssh root@<IP>`, náhodné heslo se zobrazí na konzoli při každém bootu.
