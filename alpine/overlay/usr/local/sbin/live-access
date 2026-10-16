@@ -1,0 +1,14 @@
+#!/bin/sh
+set -eu
+umask 077
+mkdir -p /run/docker-live
+if [ ! -s /run/docker-live/ssh-password ]; then
+    openssl rand -hex 12 > /run/docker-live/ssh-password
+    printf 'root:%s\n' "$(cat /run/docker-live/ssh-password)" | chpasswd
+fi
+{
+    printf '\nAlpine Docker Live - all data is temporary (RAM)\n'
+    printf 'SSH user: root\nSSH password: %s\n' "$(cat /run/docker-live/ssh-password)"
+    printf 'After login: docker ps | docker compose version\n'
+} > /run/docker-live/access.txt
+cat /run/docker-live/access.txt > /dev/console

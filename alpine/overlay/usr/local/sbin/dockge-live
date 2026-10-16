@@ -1,0 +1,20 @@
+#!/bin/sh
+set -eu
+mkdir -p /opt/stacks /opt/dockge/data /run/docker-live
+attempt=0
+until docker info >/dev/null 2>&1; do
+    attempt=$((attempt + 1))
+    [ "$attempt" -lt 60 ] || { echo 'Docker did not become ready' >&2; exit 1; }
+    sleep 1
+done
+docker compose --ansi never --progress plain --project-directory /opt/dockge up -d
+{
+    printf '\nDocker + Dockge + SSH ready (temporary RAM environment)\n'
+    for address in $(ip -4 -o addr show scope global | awk '{print $4}' | cut -d/ -f1); do
+        printf 'Dockge: http://%s:5001 (create your account on first visit)\n' "$address"
+        printf 'SSH: ssh root@%s\n' "$address"
+    done
+    printf 'SSH password: %s\n' "$(cat /run/docker-live/ssh-password)"
+    printf 'Everything, including Dockge accounts and Docker volumes, disappears on reboot.\n'
+} > /run/docker-live/access.txt
+cat /run/docker-live/access.txt > /dev/console

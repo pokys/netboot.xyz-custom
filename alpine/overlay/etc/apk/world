@@ -1,0 +1,10 @@
+alpine-base
+ca-certificates
+curl
+docker
+docker-cli-compose
+docker-openrc
+iproute2
+openssh
+openssh-server-common-openrc
+openssl

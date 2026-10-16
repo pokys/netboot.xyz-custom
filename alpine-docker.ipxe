@@ -1,0 +1,39 @@
+#!ipxe
+# Alpine diskless Docker + Dockge + SSH. Everything is stored in RAM.
+
+:alpine_docker_menu
+menu Alpine Live - Docker + Dockge + SSH
+item --gap Temporary x86_64 environment - 8 GB RAM recommended
+item alpine_docker_boot ${space} Start Alpine Docker Live
+item alpine_docker_back ${space} Return to custom menu
+choose --default alpine_docker_back alpine_docker_choice || goto alpine_docker_back
+goto ${alpine_docker_choice}
+
+:alpine_docker_boot
+iseq ${arch} x86_64 || goto alpine_docker_arch
+set alpine_live_base https://dl-cdn.alpinelinux.org/alpine/v3.24/releases/x86_64/netboot
+set alpine_live_repo https://dl-cdn.alpinelinux.org/alpine/v3.24/main,https://dl-cdn.alpinelinux.org/alpine/v3.24/community
+set alpine_live_overlay https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/alpine/docker-live.apkovl.tar.gz
+imgfree
+kernel ${alpine_live_base}/vmlinuz-lts ip=dhcp modules=loop,squashfs alpine_repo=${alpine_live_repo} modloop=${alpine_live_base}/modloop-lts apkovl=${alpine_live_overlay} rootflags=size=85% nomodeset || goto alpine_docker_failed
+initrd ${alpine_live_base}/initramfs-lts || goto alpine_docker_failed
+echo Starting temporary Docker lab. SSH credentials will appear on the console.
+boot || goto alpine_docker_failed
+goto alpine_docker_menu
+
+:alpine_docker_arch
+echo This profile requires x86_64.
+prompt Press any key to return ||
+goto alpine_docker_menu
+
+:alpine_docker_failed
+echo Alpine download or boot failed. Check network access and available RAM.
+prompt Press any key to return ||
+goto alpine_docker_menu
+
+:alpine_docker_back
+clear alpine_docker_choice
+clear alpine_live_base
+clear alpine_live_repo
+clear alpine_live_overlay
+exit 0

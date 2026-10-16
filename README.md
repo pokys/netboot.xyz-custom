@@ -13,6 +13,19 @@ will cause a custom menu to appear in the main menu.
 
 If you are new to iPXE scripting, take a look at `custom.ipxe.example` and build up from that.
 
+## Alpine Live - Docker + Dockge + SSH
+
+V sekci **Live tools** vyber **Alpine Live - Docker + Dockge + SSH**. Profil nabootuje Alpine v3.24 x86_64
+do RAM, připraví Docker a Compose, spustí Dockge a SSH. Potřebuje DHCP, internet a doporučeně alespoň **8 GB RAM**.
+
+- **Dockge:** `http://<IP>:5001`, účet vytvoříš při prvním otevření.
+- **SSH:** `ssh root@<IP>`, náhodné heslo se zobrazí na konzoli při každém bootu.
+- **Všechna data jsou dočasná:** kontejnery, images, volumes, Compose soubory i účty po restartu zmizí.
+
+Žádné disky se automaticky nepřipojují ani neformátují. Kernel/initramfs/modloop jsou z oficiálního Alpine CDN,
+balíčky z repozitářů Alpine, Dockge z Docker Hubu s připnutým digestem. Malý konfigurační archiv je v tomto repozitáři.
+[Podrobnosti, údržba a ověření](docs/alpine-docker.md).
+
 ## Windows Evaluation installer menu
 
 Položka **Windows 11 - Microsoft Evaluation** nabízí anglické x64 obrazy:

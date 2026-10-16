@@ -1,0 +1,13 @@
+#!/sbin/openrc-run
+description="Generate temporary SSH credentials for the diskless Docker lab"
+
+depend() {
+    need localmount
+    before sshd
+}
+
+start() {
+    ebegin "Preparing temporary SSH access"
+    /usr/local/sbin/live-access
+    eend $?
+}

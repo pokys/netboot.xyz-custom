@@ -1,0 +1,18 @@
+#!/sbin/openrc-run
+description="Start Dockge in the temporary Docker lab"
+
+depend() {
+    need docker sshd net live-access
+}
+
+start() {
+    ebegin "Starting Dockge (initial image download may take a while)"
+    /usr/local/sbin/dockge-live
+    eend $?
+}
+
+stop() {
+    ebegin "Stopping Dockge"
+    docker compose --project-directory /opt/dockge down
+    eend $?
+}
