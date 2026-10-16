@@ -48,6 +48,19 @@ Kontrola neověřuje celý hash ani funkčnost síťového bootu. Používá se 
 Podpora závisí na iPXE, firmwaru a dostupnosti média ve Windows Setup; může být potřeba WinPE/wimboot
 a samostatný instalační zdroj. Boot ani instalace zatím nebyly otestovány.
 
+## XCP-ng installer menu
+
+V sekci Virtualization vyber **XCP-ng - Official downloads**. Menu obsahuje všech **20 instalačních ISO**
+z oficiálních adresářů verzí **8.3, 8.2, 8.1, 8.0, 7.6 a 7.5**, včetně Full ISO a Netinstall.
+Řada **8.3 je LTS**, starší řady jsou označené jako Historical. U 8.3 zůstávají samostatné i datované revize.
+Netinstall vyžaduje síťový zdroj instalačních balíčků; Full ISO je obsahuje na médiu.
+
+Stahuje se přímo z `https://updates.xcp-ng.org/isos/`. Před bootem se zobrazí zdroj, název a přesná URL.
+[Seznam obrazů](docs/xcp-ng-images.md) obsahuje výsledky malých HTTP Range/ISO9660 kontrol ze 16. 10. 2026.
+Úplné hashe/podpisy ani skutečný boot a instalace nejsou ověřené. Menu používá ISO `sanboot`;
+[oficiální alternativa PXE/iPXE](https://docs.xcp-ng.org/installation/install-xcp-ng/) vyžaduje rozbalené instalační médium na HTTP serveru.
+Při chybě se lze vrátit do stejného seznamu nebo pokus opakovat. Instalace je interaktivní, bez answerfile.
+
 ## ESXi installer menu
 
 V custom menu vyber **VMware ESXi - Select source**. Nejprve zvolíš server, potom výrobce a verzi:

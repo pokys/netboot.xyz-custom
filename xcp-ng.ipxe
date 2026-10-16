@@ -1,0 +1,226 @@
+#!ipxe
+# Official XCP-ng ISO index reviewed 2026-10-16.
+# Small HTTP Range/ISO9660 checks passed; full hashes and booting are untested.
+
+:xcp_menu
+menu XCP-ng - Official downloads
+item --gap Source: updates.xcp-ng.org
+item xcp_family_8_3 ${space} XCP-ng 8.3 - LTS
+item xcp_family_8_2 ${space} XCP-ng 8.2 - Historical
+item xcp_family_8_1 ${space} XCP-ng 8.1 - Historical
+item xcp_family_8_0 ${space} XCP-ng 8.0 - Historical
+item xcp_family_7_6 ${space} XCP-ng 7.6 - Historical
+item xcp_family_7_5 ${space} XCP-ng 7.5 - Historical
+item xcp_back ${space} Return to custom menu
+choose --default xcp_back xcp_choice || goto xcp_back
+goto ${xcp_choice}
+
+:xcp_family_8_3
+menu XCP-ng 8.3 - updates.xcp-ng.org
+item --gap Netinstall requires a network package source in the installer
+item xcp_8_3_0_20260806 ${space} 8.3.0-20260806 - Full ISO
+item xcp_8_3_0_20260806_netinstall ${space} 8.3.0-20260806 - Netinstall
+item xcp_8_3_0_20250606 ${space} 8.3.0-20250606 - Full ISO
+item xcp_8_3_0_20250606_2 ${space} 8.3.0-20250606.2 - Full ISO
+item xcp_8_3_0_20250606_netinstall ${space} 8.3.0-20250606 - Netinstall
+item xcp_menu ${space} Back to XCP-ng versions
+choose --default xcp_menu xcp_choice || goto xcp_menu
+goto ${xcp_choice}
+
+:xcp_8_3_0_20260806
+set xcp_return xcp_family_8_3
+set xcp_image xcp-ng-8.3.0-20260806.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.3/xcp-ng-8.3.0-20260806.iso
+goto xcp_boot
+
+:xcp_8_3_0_20260806_netinstall
+set xcp_return xcp_family_8_3
+set xcp_image xcp-ng-8.3.0-20260806-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.3/xcp-ng-8.3.0-20260806-netinstall.iso
+goto xcp_boot
+
+:xcp_8_3_0_20250606
+set xcp_return xcp_family_8_3
+set xcp_image xcp-ng-8.3.0-20250606.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.3/xcp-ng-8.3.0-20250606.iso
+goto xcp_boot
+
+:xcp_8_3_0_20250606_2
+set xcp_return xcp_family_8_3
+set xcp_image xcp-ng-8.3.0-20250606.2.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.3/xcp-ng-8.3.0-20250606.2.iso
+goto xcp_boot
+
+:xcp_8_3_0_20250606_netinstall
+set xcp_return xcp_family_8_3
+set xcp_image xcp-ng-8.3.0-20250606-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.3/xcp-ng-8.3.0-20250606-netinstall.iso
+goto xcp_boot
+
+:xcp_family_8_2
+menu XCP-ng 8.2 - updates.xcp-ng.org
+item --gap Netinstall requires a network package source in the installer
+item xcp_8_2_1 ${space} 8.2.1 - Full ISO
+item xcp_8_2_1_netinstall ${space} 8.2.1 - Netinstall
+item xcp_8_2_1_20231130 ${space} 8.2.1-20231130 - Full ISO
+item xcp_8_2_1_20231130_netinstall ${space} 8.2.1-20231130 - Netinstall
+item xcp_8_2_0 ${space} 8.2.0 - Full ISO
+item xcp_8_2_0_netinstall ${space} 8.2.0 - Netinstall
+item xcp_menu ${space} Back to XCP-ng versions
+choose --default xcp_menu xcp_choice || goto xcp_menu
+goto ${xcp_choice}
+
+:xcp_8_2_1
+set xcp_return xcp_family_8_2
+set xcp_image xcp-ng-8.2.1.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.2/xcp-ng-8.2.1.iso
+goto xcp_boot
+
+:xcp_8_2_1_netinstall
+set xcp_return xcp_family_8_2
+set xcp_image xcp-ng-8.2.1-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.2/xcp-ng-8.2.1-netinstall.iso
+goto xcp_boot
+
+:xcp_8_2_1_20231130
+set xcp_return xcp_family_8_2
+set xcp_image xcp-ng-8.2.1-20231130.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.2/xcp-ng-8.2.1-20231130.iso
+goto xcp_boot
+
+:xcp_8_2_1_20231130_netinstall
+set xcp_return xcp_family_8_2
+set xcp_image xcp-ng-8.2.1-20231130-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.2/xcp-ng-8.2.1-20231130-netinstall.iso
+goto xcp_boot
+
+:xcp_8_2_0
+set xcp_return xcp_family_8_2
+set xcp_image xcp-ng-8.2.0.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.2/xcp-ng-8.2.0.iso
+goto xcp_boot
+
+:xcp_8_2_0_netinstall
+set xcp_return xcp_family_8_2
+set xcp_image xcp-ng-8.2.0-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.2/xcp-ng-8.2.0-netinstall.iso
+goto xcp_boot
+
+:xcp_family_8_1
+menu XCP-ng 8.1 - updates.xcp-ng.org
+item --gap Netinstall requires a network package source in the installer
+item xcp_8_1_0_2 ${space} 8.1.0-2 - Full ISO
+item xcp_8_1_0_2_netinstall ${space} 8.1.0-2 - Netinstall
+item xcp_menu ${space} Back to XCP-ng versions
+choose --default xcp_menu xcp_choice || goto xcp_menu
+goto ${xcp_choice}
+
+:xcp_8_1_0_2
+set xcp_return xcp_family_8_1
+set xcp_image xcp-ng-8.1.0-2.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.1/xcp-ng-8.1.0-2.iso
+goto xcp_boot
+
+:xcp_8_1_0_2_netinstall
+set xcp_return xcp_family_8_1
+set xcp_image xcp-ng-8.1.0-2-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.1/xcp-ng-8.1.0-2-netinstall.iso
+goto xcp_boot
+
+:xcp_family_8_0
+menu XCP-ng 8.0 - updates.xcp-ng.org
+item --gap Netinstall requires a network package source in the installer
+item xcp_8_0_0 ${space} 8.0.0 - Full ISO
+item xcp_8_0_0_netinstall ${space} 8.0.0 - Netinstall
+item xcp_menu ${space} Back to XCP-ng versions
+choose --default xcp_menu xcp_choice || goto xcp_menu
+goto ${xcp_choice}
+
+:xcp_8_0_0
+set xcp_return xcp_family_8_0
+set xcp_image xcp-ng-8.0.0.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.0/xcp-ng-8.0.0.iso
+goto xcp_boot
+
+:xcp_8_0_0_netinstall
+set xcp_return xcp_family_8_0
+set xcp_image xcp-ng-8.0.0-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/8.0/xcp-ng-8.0.0-netinstall.iso
+goto xcp_boot
+
+:xcp_family_7_6
+menu XCP-ng 7.6 - updates.xcp-ng.org
+item --gap Netinstall requires a network package source in the installer
+item xcp_7_6_0 ${space} 7.6.0 - Full ISO
+item xcp_7_6_0_netinstall ${space} 7.6.0 - Netinstall
+item xcp_menu ${space} Back to XCP-ng versions
+choose --default xcp_menu xcp_choice || goto xcp_menu
+goto ${xcp_choice}
+
+:xcp_7_6_0
+set xcp_return xcp_family_7_6
+set xcp_image xcp-ng-7.6.0.iso
+set xcp_url https://updates.xcp-ng.org/isos/7.6/xcp-ng-7.6.0.iso
+goto xcp_boot
+
+:xcp_7_6_0_netinstall
+set xcp_return xcp_family_7_6
+set xcp_image xcp-ng-7.6.0-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/7.6/xcp-ng-7.6.0-netinstall.iso
+goto xcp_boot
+
+:xcp_family_7_5
+menu XCP-ng 7.5 - updates.xcp-ng.org
+item --gap Netinstall requires a network package source in the installer
+item xcp_7_5_0 ${space} 7.5.0 - Full ISO
+item xcp_7_5_0_2 ${space} 7.5.0-2 - Full ISO
+item xcp_7_5_0_2_netinstall ${space} 7.5.0-2 - Netinstall
+item xcp_menu ${space} Back to XCP-ng versions
+choose --default xcp_menu xcp_choice || goto xcp_menu
+goto ${xcp_choice}
+
+:xcp_7_5_0
+set xcp_return xcp_family_7_5
+set xcp_image xcp-ng-7.5.0.iso
+set xcp_url https://updates.xcp-ng.org/isos/7.5/xcp-ng-7.5.0.iso
+goto xcp_boot
+
+:xcp_7_5_0_2
+set xcp_return xcp_family_7_5
+set xcp_image xcp-ng-7.5.0-2.iso
+set xcp_url https://updates.xcp-ng.org/isos/7.5/xcp-ng-7.5.0-2.iso
+goto xcp_boot
+
+:xcp_7_5_0_2_netinstall
+set xcp_return xcp_family_7_5
+set xcp_image xcp-ng-7.5.0-2-netinstall.iso
+set xcp_url https://updates.xcp-ng.org/isos/7.5/xcp-ng-7.5.0-2-netinstall.iso
+goto xcp_boot
+
+:xcp_boot
+imgfree
+echo Source: XCP-ng - updates.xcp-ng.org
+echo ISO: ${xcp_image}
+echo URL: ${xcp_url}
+sanboot --no-describe --drive 0x80 ${xcp_url} || goto xcp_failed
+goto ${xcp_return}
+
+:xcp_failed
+echo ISO boot failed. Check source access and firmware HTTP(S) SAN boot support.
+echo XCP-ng also supports installation from extracted media over HTTP.
+menu XCP-ng - Download or boot failed
+item xcp_boot ${space} Retry this ISO
+item xcp_return_to_list ${space} Return to image list
+item xcp_back ${space} Return to custom menu
+choose --default xcp_return_to_list xcp_choice || goto xcp_return_to_list
+goto ${xcp_choice}
+
+:xcp_return_to_list
+goto ${xcp_return}
+
+:xcp_back
+clear xcp_choice
+clear xcp_image
+clear xcp_url
+clear xcp_return
+exit 0

@@ -12,6 +12,7 @@ item windows_eval ${space} Windows 11 - Microsoft Evaluation
 item windows_server ${space} Windows Server - Microsoft Evaluation
 item --gap Virtualization
 item esxi ${space} VMware ESXi - Select source
+item xcp_ng ${space} XCP-ng - Official downloads
 choose custom_choice || goto custom_exit
 echo ${cls}
 goto ${custom_choice}
@@ -31,6 +32,10 @@ goto custom
 
 :esxi
 chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/esxi.ipxe || goto custom_exit
+goto custom
+
+:xcp_ng
+chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/xcp-ng.ipxe || goto custom_exit
 goto custom
 
 :custom_exit
