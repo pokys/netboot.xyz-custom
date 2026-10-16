@@ -1,0 +1,53 @@
+#!ipxe
+# Official Microsoft Evaluation Center ISO links, reviewed 2026-10-16.
+# 180-day Evaluation media. Full ISO hashes and booting have not been tested.
+
+:server_menu
+menu Windows Server - Microsoft Evaluation
+item --gap Official Microsoft ISO - English x64 - 180-day Evaluation
+item server_2025 ${space} Windows Server 2025 - Evaluation - EN - Microsoft
+item server_2022 ${space} Windows Server 2022 - Evaluation - EN - Microsoft
+item server_2019 ${space} Windows Server 2019 - Evaluation - EN - Microsoft
+item server_back ${space} Return to custom menu
+choose --default server_back server_choice || goto server_back
+goto ${server_choice}
+
+:server_2025
+set server_image Windows Server 2025 Evaluation - EN x64
+set server_url https://software-static.download.prss.microsoft.com/dbazure/998969d5-f34g-4e03-ac9d-1f9786c66749/26100.32230.260111-0550.lt_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso
+goto server_boot
+
+:server_2022
+set server_image Windows Server 2022 Evaluation - EN x64
+set server_url https://software-static.download.prss.microsoft.com/sg/download/888969d5-f34g-4e03-ac9d-1f9786c66749/SERVER_EVAL_x64FRE_en-us.iso
+goto server_boot
+
+:server_2019
+set server_image Windows Server 2019 Evaluation - EN x64
+set server_url https://software-static.download.prss.microsoft.com/dbazure/988969d5-f34g-4e03-ac9d-1f9786c66749/17763.3650.221105-1748.rs5_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso
+goto server_boot
+
+:server_boot
+imgfree
+echo ${server_image}
+echo Source: Microsoft - software-static.download.prss.microsoft.com
+echo URL: ${server_url}
+echo Select Standard or Datacenter, Core or Desktop Experience in Windows Setup.
+sanboot --no-describe --drive 0x80 ${server_url} || goto server_failed
+goto server_menu
+
+:server_failed
+echo ISO boot failed. HTTP availability does not guarantee firmware or Windows Setup compatibility.
+echo Windows Setup may require WinPE/wimboot and a separate installation source.
+menu Windows Server - Download or boot failed
+item server_boot ${space} Retry this ISO
+item server_menu ${space} Return to Windows Server versions
+item server_back ${space} Return to custom menu
+choose --default server_menu server_choice || goto server_menu
+goto ${server_choice}
+
+:server_back
+clear server_choice
+clear server_image
+clear server_url
+exit 0

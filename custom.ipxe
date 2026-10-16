@@ -8,6 +8,7 @@ clear custom_choice
 menu Custom Boot Menu
 item --gap Windows
 item win11_iso ${space} Windows 11 - ISO installer
+item windows_server ${space} Windows Server - Microsoft Evaluation
 item --gap Virtualization
 item esxi ${space} VMware ESXi - Select source
 choose custom_choice || goto custom_exit
@@ -18,6 +19,10 @@ goto custom_exit
 :win11_iso
 sanboot --no-describe --drive 0x80 http://software-static.download.prss.microsoft.com/dbazure/888969d5-f34g-4e03-ac9d-1f9786c66749/26200.6584.250915-1905.25h2_ge_release_svc_refresh_CLIENT_CONSUMER_x64FRE_cs-cz.iso || goto custom_exit
 boot || goto custom_exit
+
+:windows_server
+chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/windows-server.ipxe || goto custom_exit
+goto custom
 
 :esxi
 chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/esxi.ipxe || goto custom_exit

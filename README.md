@@ -13,6 +13,24 @@ will cause a custom menu to appear in the main menu.
 
 If you are new to iPXE scripting, take a look at `custom.ipxe.example` and build up from that.
 
+## Windows Server installer menu
+
+V custom menu vyber **Windows Server - Microsoft Evaluation**. K dispozici jsou anglické x64 ISO:
+
+- [Windows Server 2025](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2025)
+- [Windows Server 2022](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2022)
+- [Windows Server 2019](https://www.microsoft.com/en-us/evalcenter/download-windows-server-2019)
+
+Všechny položky používají přímé ISO URL na `software-static.download.prss.microsoft.com`.
+Jde o **180denní Evaluation obrazy**, nikoli plná licenční média. Standard/Datacenter a Server Core/Desktop Experience
+vybíráš v instalátoru. Menu nepředává automatickou instalaci ani nevybírá cílový disk.
+Před bootem vypíše zdroj a přesnou URL; při chybě nabídne opakování nebo návrat.
+
+Dne 16. 10. 2026 prošly všechny tři URL kontrolou HTTP 206, rozsahu bytes 32768-32831 a ISO9660.
+Kontrola neověřuje celý hash ani funkčnost síťového bootu. Používá se `sanboot` stejně jako u původní Windows 11 položky.
+Podpora závisí na iPXE, firmwaru a dostupnosti média ve Windows Setup; může být potřeba WinPE/wimboot
+a samostatný instalační zdroj. Boot ani instalace zatím nebyly otestovány.
+
 ## ESXi installer menu
 
 V custom menu vyber **VMware ESXi - Select source**. Nejprve zvolíš server, potom výrobce a verzi:
