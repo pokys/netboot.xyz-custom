@@ -7,4 +7,5 @@
 *.sh text eol=lf
 *.yaml text eol=lf
 alpine/overlay/** text eol=lf
+alpine/tailcat-overlay/** text eol=lf
 *.tar.gz binary
