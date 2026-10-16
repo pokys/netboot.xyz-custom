@@ -1,0 +1,36 @@
+#!ipxe
+# Official Ventoy LiveCD: interactive USB installation/update utility.
+
+:ventoy_menu
+menu Ventoy LiveCD 1.1.18 - USB installer / updater
+item --gap Source: official ventoy/Ventoy GitHub release - x86_64
+item --gap Installs Ventoy on a selected disk. Check the target in the GUI.
+item ventoy_boot ${space} Boot Ventoy LiveCD 1.1.18
+item ventoy_back ${space} Return to custom menu
+choose --default ventoy_back ventoy_choice || goto ventoy_back
+goto ${ventoy_choice}
+
+:ventoy_boot
+iseq ${arch} x86_64 || goto ventoy_arch
+set ventoy_url https://github.com/ventoy/Ventoy/releases/download/v1.1.18/ventoy-1.1.18-livecd.iso
+imgfree
+echo Source: official Ventoy GitHub release
+echo URL: ${ventoy_url}
+echo Loading LiveCD. Select the USB target manually in the Ventoy GUI.
+sanboot --no-describe --drive 0x80 ${ventoy_url} || goto ventoy_failed
+goto ventoy_menu
+
+:ventoy_arch
+echo This Ventoy LiveCD requires x86_64.
+prompt Press any key to return ||
+goto ventoy_menu
+
+:ventoy_failed
+echo LiveCD boot failed. Check GitHub access and firmware HTTP(S) SAN support.
+prompt Press any key to return ||
+goto ventoy_menu
+
+:ventoy_back
+clear ventoy_choice
+clear ventoy_url
+exit 0

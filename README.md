@@ -151,3 +151,10 @@ nemění zkontrolovaný katalog. Novější stránky Dell Support vyžadují sam
 ```text
 python tools/discover_dell_esxi.py
 ```
+
+## Ventoy LiveCD
+
+V **Live tools** vyber **Ventoy LiveCD - USB installer / updater**. Oficiální LiveCD
+**1.1.18** otevře grafický nástroj pro instalaci/aktualizaci Ventoy na ručně vybraném USB či disku.
+Používá přímo ISO z oficiálního GitHub release, bez vlastního assets serveru.
+[Zdroj, SHA256 a rozsah ověření](docs/ventoy-livecd.md).
