@@ -9150,14 +9150,28 @@
       "filename": "VMware-VMvisor-Installer-8.0.0.update03-24414501.x86_64-Dell_Customized-A03.iso",
       "url": "https://downloads.dell.com/FOLDER13006631M/1/VMware-VMvisor-Installer-8.0.0.update03-24414501.x86_64-Dell_Customized-A03.iso",
       "sources": [
-        "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ywdf8"
+        "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=ywdf8",
+        "https://vmware.digiboy.ir/8.X/"
       ],
       "check": {
         "date": "2026-10-16",
         "usable": false,
         "status": 403
       },
-      "sha256": "df16b1538681bc30509cea4bcc98ea59e6abfeda4c3fab70bae5b5ee17ab493b"
+      "sha256": "df16b1538681bc30509cea4bcc98ea59e6abfeda4c3fab70bae5b5ee17ab493b",
+      "alternate_urls": [
+        "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0.0.update03-24414501.x86_64-Dell_Customized-A03.iso"
+      ],
+      "alternate_checks": {
+        "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0.0.update03-24414501.x86_64-Dell_Customized-A03.iso": {
+          "date": "2026-10-16",
+          "usable": true,
+          "status": 206,
+          "range": "bytes 32768-32831/646584320",
+          "iso9660": true,
+          "size": 646584320
+        }
+      }
     },
     {
       "id": "image_7d8cda58c96c",
@@ -9171,14 +9185,28 @@
       "filename": "VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A05.iso",
       "url": "https://downloads.dell.com/FOLDER13571202M/1/VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A05.iso",
       "sources": [
-        "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=fgcnv"
+        "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=fgcnv",
+        "https://vmware.digiboy.ir/8.X/"
       ],
       "check": {
         "date": "2026-10-16",
         "usable": false,
         "status": 403
       },
-      "sha256": "20b44358fcd5d3ca3bd847fba4b893c7bb93feae21bf463babca09d4c3912799"
+      "sha256": "20b44358fcd5d3ca3bd847fba4b893c7bb93feae21bf463babca09d4c3912799",
+      "alternate_urls": [
+        "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A05.iso"
+      ],
+      "alternate_checks": {
+        "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A05.iso": {
+          "date": "2026-10-16",
+          "usable": true,
+          "status": 206,
+          "range": "bytes 32768-32831/659456000",
+          "iso9660": true,
+          "size": 659456000
+        }
+      }
     },
     {
       "id": "image_424256b92d3c",
@@ -9192,14 +9220,28 @@
       "filename": "VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A06.iso",
       "url": "https://downloads.dell.com/FOLDER13784892M/1/VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A06.iso",
       "sources": [
-        "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=vjg1r"
+        "https://www.dell.com/support/home/en-us/drivers/driversdetails?driverid=vjg1r",
+        "https://vmware.digiboy.ir/8.X/"
       ],
       "check": {
         "date": "2026-10-16",
         "usable": false,
         "status": 403
       },
-      "sha256": "59c55b95996daf90e5a8e84e104031eafbb250e19f7103bb90eb99671c451838"
+      "sha256": "59c55b95996daf90e5a8e84e104031eafbb250e19f7103bb90eb99671c451838",
+      "alternate_urls": [
+        "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A06.iso"
+      ],
+      "alternate_checks": {
+        "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A06.iso": {
+          "date": "2026-10-16",
+          "usable": true,
+          "status": 206,
+          "range": "bytes 32768-32831/659453952",
+          "iso9660": true,
+          "size": 659453952
+        }
+      }
     },
     {
       "id": "image_378a7d8514ed",
@@ -9333,7 +9375,8 @@
       "filename": "VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.20-SuperdomeFlex-June2025.iso",
       "url": "https://mirror.mahanserver.net/VMware/ESXI/9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.20-SuperdomeFlex-June2025.iso",
       "sources": [
-        "https://mirror.mahanserver.net/VMware/ESXI/9/"
+        "https://mirror.mahanserver.net/VMware/ESXI/9/",
+        "https://vmware.digiboy.ir/9.X/"
       ],
       "check": {
         "date": "2026-10-16",
@@ -9343,7 +9386,20 @@
         "iso9660": true,
         "size": 661833728
       },
-      "mirror_path": "9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.20-SuperdomeFlex-June2025.iso"
+      "mirror_path": "9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.20-SuperdomeFlex-June2025.iso",
+      "alternate_urls": [
+        "https://vmware.digiboy.ir/9.X/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.20-SuperdomeFlex-June2025.iso"
+      ],
+      "alternate_checks": {
+        "https://vmware.digiboy.ir/9.X/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.20-SuperdomeFlex-June2025.iso": {
+          "date": "2026-10-16",
+          "usable": true,
+          "status": 206,
+          "range": "bytes 32768-32831/661833728",
+          "iso9660": true,
+          "size": 661833728
+        }
+      }
     },
     {
       "id": "image_3d79f67648c5",
@@ -9357,7 +9413,8 @@
       "filename": "VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.29-jun2025.iso",
       "url": "https://mirror.mahanserver.net/VMware/ESXI/9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.29-jun2025.iso",
       "sources": [
-        "https://mirror.mahanserver.net/VMware/ESXI/9/"
+        "https://mirror.mahanserver.net/VMware/ESXI/9/",
+        "https://vmware.digiboy.ir/9.X/"
       ],
       "check": {
         "date": "2026-10-16",
@@ -9367,7 +9424,20 @@
         "iso9660": true,
         "size": 751042560
       },
-      "mirror_path": "9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.29-jun2025.iso"
+      "mirror_path": "9/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.29-jun2025.iso",
+      "alternate_urls": [
+        "https://vmware.digiboy.ir/9.X/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.29-jun2025.iso"
+      ],
+      "alternate_checks": {
+        "https://vmware.digiboy.ir/9.X/VMware-ESXi-9.0.0-24755229-HPE-900.0.0.12.1.0.29-jun2025.iso": {
+          "date": "2026-10-16",
+          "usable": true,
+          "status": 206,
+          "range": "bytes 32768-32831/751042560",
+          "iso9660": true,
+          "size": 751042560
+        }
+      }
     },
     {
       "id": "image_3014c34ade6c",
@@ -9557,12 +9627,722 @@
       "filename": "VMware-VMvisor-Installer-9.0.0.0.24755229.x86_64.iso",
       "url": "https://pubdl-us1.hausmer.com/esxi/VMware-VMvisor-Installer-9.0.0.0.24755229.x86_64.iso",
       "sources": [
-        "https://hausmer.com/posts/vmware-downloads/#esxi"
+        "https://hausmer.com/posts/vmware-downloads/#esxi",
+        "https://vmware.digiboy.ir/9.X/"
       ],
       "check": {
         "date": "2026-10-16",
         "usable": false,
         "status": 403
+      },
+      "alternate_urls": [
+        "https://vmware.digiboy.ir/9.X/VMware-VMvisor-Installer-9.0.0.0.24755229.x86_64.iso"
+      ],
+      "alternate_checks": {
+        "https://vmware.digiboy.ir/9.X/VMware-VMvisor-Installer-9.0.0.0.24755229.x86_64.iso": {
+          "date": "2026-10-16",
+          "usable": true,
+          "status": 206,
+          "range": "bytes 32768-32831/651687936",
+          "iso9660": true,
+          "size": 651687936
+        }
+      }
+    },
+    {
+      "id": "image_e39c0bd49bcd",
+      "vendor": "HPE",
+      "family": "6.0",
+      "version": "6.0 U3",
+      "build": 13635687,
+      "revision": "",
+      "flavor": "Gen9+",
+      "label": "ESXi 6.0 U3 build 13635687 - Gen9+",
+      "filename": "VMware-ESXi-6.0.0-Update3-13635687-HPE-Gen9plus-600.10.4.5.15-Sep2019.iso",
+      "url": "https://vmware.digiboy.ir/6.X/VMware-ESXi-6.0.0-Update3-13635687-HPE-Gen9plus-600.10.4.5.15-Sep2019.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/6.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/4259840",
+        "iso9660": true,
+        "size": 4259840
+      }
+    },
+    {
+      "id": "image_1506abc477f5",
+      "vendor": "HPE",
+      "family": "6.5",
+      "version": "6.5 U3",
+      "build": 14990892,
+      "revision": "",
+      "flavor": "Gen9+",
+      "label": "ESXi 6.5 U3 build 14990892 - Gen9+",
+      "filename": "VMware-ESXi-6.5.0-Update3-14990892-HPE-Gen9plus-650.U3.10.5.0.67-Dec2019.iso",
+      "url": "https://vmware.digiboy.ir/6.X/VMware-ESXi-6.5.0-Update3-14990892-HPE-Gen9plus-650.U3.10.5.0.67-Dec2019.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/6.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/366477312",
+        "iso9660": true,
+        "size": 366477312
+      }
+    },
+    {
+      "id": "image_550e3ac5c621",
+      "vendor": "Community",
+      "family": "6.7",
+      "version": "6.7",
+      "build": 8169922,
+      "revision": "",
+      "flavor": "RTL8111 community",
+      "label": "ESXi 6.7 build 8169922 - RTL8111 community",
+      "filename": "VMware-ESXi-6.7.0-8169922-RTL8111.iso",
+      "url": "https://vmware.digiboy.ir/6.X/VMware-ESXi-6.7.0-8169922-RTL8111.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/6.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/328781824",
+        "iso9660": true,
+        "size": 328781824
+      }
+    },
+    {
+      "id": "image_11520bac8fe6",
+      "vendor": "HPE",
+      "family": "6.7",
+      "version": "6.7 U3",
+      "build": 19195723,
+      "revision": "",
+      "flavor": "Gen9+",
+      "label": "ESXi 6.7 U3 build 19195723 - Gen9+",
+      "filename": "VMware-ESXi-6.7.0-Update3-19195723-HPE-Gen9plus-670.U3.10.9.0.8-Apr2022.iso",
+      "url": "https://vmware.digiboy.ir/6.X/VMware-ESXi-6.7.0-Update3-19195723-HPE-Gen9plus-670.U3.10.9.0.8-Apr2022.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/6.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/420900864",
+        "iso9660": true,
+        "size": 420900864
+      }
+    },
+    {
+      "id": "image_3047d29670b4",
+      "vendor": "Dell",
+      "family": "6.5",
+      "version": "6.5 U03",
+      "build": 20502893,
+      "revision": "A10",
+      "flavor": "Installer",
+      "label": "ESXi 6.5 U03 A10 build 20502893",
+      "filename": "VMware-VMvisor-Installer-6.5.0.update03-20502893.x86_64-DellEMC_Customized-A10.iso",
+      "url": "https://vmware.digiboy.ir/6.X/VMware-VMvisor-Installer-6.5.0.update03-20502893.x86_64-DellEMC_Customized-A10.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/6.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/351221760",
+        "iso9660": true,
+        "size": 351221760
+      }
+    },
+    {
+      "id": "image_b324471f6780",
+      "vendor": "HPE",
+      "family": "7.0",
+      "version": "7.0 U3",
+      "build": 24411414,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 7.0 U3 build 24411414",
+      "filename": "VMware-ESXi-7.0.3-24411414-HPE-703.0.0.11.9.0.5-Feb2025.iso",
+      "url": "https://vmware.digiboy.ir/7.X/VMware-ESXi-7.0.3-24411414-HPE-703.0.0.11.9.0.5-Feb2025.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/7.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/480045056",
+        "iso9660": true,
+        "size": 480045056
+      }
+    },
+    {
+      "id": "image_a8a73cabde07",
+      "vendor": "Cisco",
+      "family": "7.0",
+      "version": "7.0 U3o",
+      "build": 22348816,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 7.0 U3o build 22348816",
+      "filename": "VMware-ESXi-7.0.3o-22348816-Custom-Cisco-4.3.2-a.1.iso",
+      "url": "https://vmware.digiboy.ir/7.X/VMware-ESXi-7.0.3o-22348816-Custom-Cisco-4.3.2-a.1.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/7.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/417175552",
+        "iso9660": true,
+        "size": 417175552
+      }
+    },
+    {
+      "id": "image_7b984b231a0c",
+      "vendor": "Dell",
+      "family": "7.0",
+      "version": "7.0 U03",
+      "build": 24585291,
+      "revision": "A26",
+      "flavor": "Installer",
+      "label": "ESXi 7.0 U03 A26 build 24585291",
+      "filename": "VMware-VMvisor-Installer-7.0.0.update03-24585291.x86_64-Dell_Customized-A26.iso",
+      "url": "https://vmware.digiboy.ir/7.X/VMware-VMvisor-Installer-7.0.0.update03-24585291.x86_64-Dell_Customized-A26.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/7.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/413100032",
+        "iso9660": true,
+        "size": 413100032
+      }
+    },
+    {
+      "id": "image_aca76fec5476",
+      "vendor": "Standard",
+      "family": "7.0",
+      "version": "7.0 U3n",
+      "build": 21930508,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 7.0 U3n build 21930508",
+      "filename": "VMware-VMvisor-Installer-7.0U3n-21930508.x86_64.iso",
+      "url": "https://vmware.digiboy.ir/7.X/VMware-VMvisor-Installer-7.0U3n-21930508.x86_64.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/7.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/400605184",
+        "iso9660": true,
+        "size": 400605184
+      }
+    },
+    {
+      "id": "image_4c1c3ce69c67",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24280767,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3 build 24280767",
+      "filename": "VMware-ESXi-8.0.3-24280767-HPE-803.0.0.11.8.0.6-Oct2024.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.3-24280767-HPE-803.0.0.11.8.0.6-Oct2024.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/718090240",
+        "iso9660": true,
+        "size": 718090240
+      }
+    },
+    {
+      "id": "image_c0f6d83194e7",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24280767,
+      "revision": "",
+      "flavor": "Synergy",
+      "label": "ESXi 8.0 U3 build 24280767 - Synergy",
+      "filename": "vmware-esxi-8.0.3-24280767-HPE-803.0.0.11.8.5.4-Nov2024-Synergy.iso",
+      "url": "https://vmware.digiboy.ir/8.X/vmware-esxi-8.0.3-24280767-HPE-803.0.0.11.8.5.4-Nov2024-Synergy.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/667006976",
+        "iso9660": true,
+        "size": 667006976
+      }
+    },
+    {
+      "id": "image_8506459af3d6",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24414501,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3 build 24414501",
+      "filename": "VMware-ESXi-8.0.3-24414501-HPE-803.0.0.11.9.0.7-Feb2025.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.3-24414501-HPE-803.0.0.11.9.0.7-Feb2025.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/720240640",
+        "iso9660": true,
+        "size": 720240640
+      }
+    },
+    {
+      "id": "image_c69cbc9fa736",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24414501,
+      "revision": "",
+      "flavor": "Superdome Flex",
+      "label": "ESXi 8.0 U3 build 24414501 - Superdome Flex",
+      "filename": "VMware-ESXi-8.0.3-24414501-HPE-803.0.0.12.1.0.1-SuperdomeFlex-Feb2025.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.3-24414501-HPE-803.0.0.12.1.0.1-SuperdomeFlex-Feb2025.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/646080512",
+        "iso9660": true,
+        "size": 646080512
+      }
+    },
+    {
+      "id": "image_44edb77d279e",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24674464,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3 build 24674464",
+      "filename": "VMware-ESXi-8.0.3-24674464-HPE-803.0.0.12.1.0.11-apr2025.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.3-24674464-HPE-803.0.0.12.1.0.11-apr2025.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/750051328",
+        "iso9660": true,
+        "size": 750051328
+      }
+    },
+    {
+      "id": "image_68f42ab1694c",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24859861,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3 build 24859861",
+      "filename": "VMware-ESXi-8.0.3-24859861-HPE-803.0.0.12.2.0.9-oct2025.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.3-24859861-HPE-803.0.0.12.2.0.9-oct2025.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/767496192",
+        "iso9660": true,
+        "size": 767496192
+      }
+    },
+    {
+      "id": "image_a2737686be7a",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24859861,
+      "revision": "",
+      "flavor": "Synergy",
+      "label": "ESXi 8.0 U3 build 24859861 - Synergy",
+      "filename": "VMware-ESXi-8.0.3-24859861-HPE-803.0.0.12.3.5.6-Oct2025-Synergy.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.3-24859861-HPE-803.0.0.12.3.5.6-Oct2025-Synergy.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/731437056",
+        "iso9660": true,
+        "size": 731437056
+      }
+    },
+    {
+      "id": "image_e4027885157d",
+      "vendor": "HPE",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 25205845,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3 build 25205845",
+      "filename": "VMware-ESXi-8.0.3-25205845-HPE-803.0.0.12.3.0.6-apr2026.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.3-25205845-HPE-803.0.0.12.3.0.6-apr2026.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/769017856",
+        "iso9660": true,
+        "size": 769017856
+      }
+    },
+    {
+      "id": "image_2203f4aa6231",
+      "vendor": "Cisco",
+      "family": "8.0",
+      "version": "8.0 U3",
+      "build": 24022510,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3 build 24022510",
+      "filename": "VMware-ESXi-8.0.U3-24022510-Custom-Cisco-4.3.4-a.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.U3-24022510-Custom-Cisco-4.3.4-a.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/646701056",
+        "iso9660": true,
+        "size": 646701056
+      }
+    },
+    {
+      "id": "image_60231d094125",
+      "vendor": "Cisco",
+      "family": "8.0",
+      "version": "8.0 U3g",
+      "build": 24859861,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3g build 24859861",
+      "filename": "VMware-ESXi-8.0.U3g-24859861-Custom-Cisco-4.3.7-a.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-ESXi-8.0.U3g-24859861-Custom-Cisco-4.3.7-a.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/671596544",
+        "iso9660": true,
+        "size": 671596544
+      }
+    },
+    {
+      "id": "image_6cc3e488224f",
+      "vendor": "Dell",
+      "family": "8.0",
+      "version": "8.0 U03",
+      "build": 24674464,
+      "revision": "A04",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U03 A04 build 24674464",
+      "filename": "VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A04.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0.0.update03-24674464.x86_64-Dell_Customized-A04.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/659120128",
+        "iso9660": true,
+        "size": 659120128
+      }
+    },
+    {
+      "id": "image_1813815b6cb0",
+      "vendor": "Standard",
+      "family": "8.0",
+      "version": "8.0 U3e",
+      "build": 24674464,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3e build 24674464",
+      "filename": "VMware-VMvisor-Installer-8.0U3e-24674464.x86_64.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0U3e-24674464.x86_64.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/648341504",
+        "iso9660": true,
+        "size": 648341504
+      }
+    },
+    {
+      "id": "image_85467c4efbce",
+      "vendor": "Standard",
+      "family": "8.0",
+      "version": "8.0 U3g",
+      "build": 24859861,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3g build 24859861",
+      "filename": "VMware-VMvisor-Installer-8.0U3g-24859861.x86_64.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0U3g-24859861.x86_64.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/659443712",
+        "iso9660": true,
+        "size": 659443712
+      }
+    },
+    {
+      "id": "image_2d4d60d85c18",
+      "vendor": "Standard",
+      "family": "8.0",
+      "version": "8.0 U3h",
+      "build": 25067014,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3h build 25067014",
+      "filename": "VMware-VMvisor-Installer-8.0U3h-25067014.x86_64.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0U3h-25067014.x86_64.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/659613696",
+        "iso9660": true,
+        "size": 659613696
+      }
+    },
+    {
+      "id": "image_c5014906bed6",
+      "vendor": "Standard",
+      "family": "8.0",
+      "version": "8.0 U3i",
+      "build": 25205845,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3i build 25205845",
+      "filename": "VMware-VMvisor-Installer-8.0U3i-25205845.x86_64.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0U3i-25205845.x86_64.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/660019200",
+        "iso9660": true,
+        "size": 660019200
+      }
+    },
+    {
+      "id": "image_55ce7b7ef5bb",
+      "vendor": "Standard",
+      "family": "8.0",
+      "version": "8.0 U3j",
+      "build": 25429389,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3j build 25429389",
+      "filename": "VMware-VMvisor-Installer-8.0U3j-25429389.x86_64.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0U3j-25429389.x86_64.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/660588544",
+        "iso9660": true,
+        "size": 660588544
+      }
+    },
+    {
+      "id": "image_9d7a8546e97c",
+      "vendor": "Standard",
+      "family": "8.0",
+      "version": "8.0 U3k",
+      "build": 25595708,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U3k build 25595708",
+      "filename": "VMware-VMvisor-Installer-8.0U3k-25595708.x86_64.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware-VMvisor-Installer-8.0U3k-25595708.x86_64.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/695339008",
+        "iso9660": true,
+        "size": 695339008
+      }
+    },
+    {
+      "id": "image_22fd1586e7bc",
+      "vendor": "Dell",
+      "family": "8.0",
+      "version": "8.0 U03",
+      "build": 25205845,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U03 build 25205845 (revision unspecified)",
+      "filename": "VMware_VMvisor_Installer_8_0_0_update03_25205845_x86_64_Dell_Customized.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware_VMvisor_Installer_8_0_0_update03_25205845_x86_64_Dell_Customized.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/671444992",
+        "iso9660": true,
+        "size": 671444992
+      }
+    },
+    {
+      "id": "image_9f7e4abca299",
+      "vendor": "Dell",
+      "family": "8.0",
+      "version": "8.0 U03",
+      "build": 25429389,
+      "revision": "",
+      "flavor": "Installer",
+      "label": "ESXi 8.0 U03 build 25429389 (revision unspecified)",
+      "filename": "VMware_VMvisor_Installer_8_0_0_update03_25429389_x86_64_Dell_Customized.iso",
+      "url": "https://vmware.digiboy.ir/8.X/VMware_VMvisor_Installer_8_0_0_update03_25429389_x86_64_Dell_Customized.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/8.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/672038912",
+        "iso9660": true,
+        "size": 672038912
+      }
+    },
+    {
+      "id": "image_0b2a988370bd",
+      "vendor": "Dell",
+      "family": "9.0",
+      "version": "9.0",
+      "build": 24755229,
+      "revision": "A00",
+      "flavor": "Installer",
+      "label": "ESXi 9.0 A00 build 24755229",
+      "filename": "VMware-VMvisor-Installer-9.0.0.0-24755229.x86_64-Dell-CI-A00.iso",
+      "url": "https://vmware.digiboy.ir/9.X/VMware-VMvisor-Installer-9.0.0.0-24755229.x86_64-Dell-CI-A00.iso",
+      "sources": [
+        "https://vmware.digiboy.ir/9.X/"
+      ],
+      "source_type": "third-party",
+      "check": {
+        "date": "2026-10-16",
+        "usable": true,
+        "status": 206,
+        "range": "bytes 32768-32831/654809088",
+        "iso9660": true,
+        "size": 654809088
       }
     }
   ]

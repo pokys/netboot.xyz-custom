@@ -9,7 +9,7 @@ menu Custom Boot Menu
 item --gap Windows
 item win11_iso ${space} Windows 11 - ISO installer
 item --gap Virtualization
-item esxi ${space} VMware ESXi - Select version
+item esxi ${space} VMware ESXi - Select source
 choose custom_choice || goto custom_exit
 echo ${cls}
 goto ${custom_choice}

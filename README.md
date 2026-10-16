@@ -15,49 +15,48 @@ If you are new to iPXE scripting, take a look at `custom.ipxe.example` and build
 
 ## ESXi installer menu
 
-V custom menu vyber **VMware ESXi - Select version**. Nabídka je rozdělená na **Standard / Dell / HPE**,
-dále podle verzí a po nejvýše 12 obrazech na stránku. Každá položka uvádí build; u Dellu také revizi Axx.
+V custom menu vyber **VMware ESXi - Select source**. Nejprve zvolíš server, potom výrobce a verzi:
 
-Katalog obsahuje **192 různých ISO obrazů**:
+- **Dell - official downloads**: přímé URL na serverech Dellu.
+- **MahanServer - third-party mirror**: kopie z MahanServeru.
+- **Hausmer - third-party mirror**: odkazy ze seznamu Hausmer.
+- **Digiboy - third-party mirror**: přímé odkazy z živého serveru `vmware.digiboy.ir`.
 
-- **176 Dell customized** přímo z `downloads.dell.com` / `dl.dell.com`, včetně historických verzí 3.5 až 8.0.
-- **9 standardních obrazů** z MahanServeru a [Hausmerova seznamu](https://hausmer.com/posts/vmware-downloads/#esxi), včetně ESXi 9.0, 8.0 U3e/U3b/U2b a 7.0 U3n.
-- **7 HPE obrazů** z [MahanServeru](https://mirror.mahanserver.net/VMware/ESXI/).
+Katalog obsahuje **221 různých názvů ISO** a **229 download URL**. Digiboy přidává 35 URL,
+z toho 29 názvů nebylo v předchozím katalogu. Obsahuje i Dell ESXi 9.0 A00, novější standardní obrazy,
+HPE, Cisco a samostatně označený komunitní obraz s RTL8111.
+Stejný název na různých serverech neprokazuje totožný obsah. Různé buildy a revize Axx zůstávají samostatné;
+u přejmenovaných Dell ISO bez revize se revize nevymýšlí. Patch/depot ZIPy nejsou bootovací ISO.
 
-[Úplný seznam obrazů, download URL a výsledků kontroly](docs/esxi-images.md) se generuje z [katalogu](catalog/esxi.json).
-Stejné názvy ISO jsou sloučené; různé buildy a revize Axx zůstávají samostatné. Historická média Installer/Recovery se rozlišují.
-Patch/depot ZIPy, add-on balíčky a samotné release notes nejsou bootovací ISO.
+Každá stránka má nejvýše 12 obrazů. Před bootem se vypíše zdroj a přesná URL.
+Menu nepřepíná mirror automaticky; při chybě lze opakovat pokus nebo se vrátit k výběru zdroje.
+Původní Dell ISO z MahanServeru zůstává dostupné přímo v sekci MahanServer.
+URL jsou pevné; dřívější přepis `esxi_mirror_base_url` se již nepoužívá, aby název zdroje odpovídal skutečnému serveru.
+
+[Úplný seznam URL a kontrol](docs/esxi-images.md) se generuje z [katalogu](catalog/esxi.json).
+Kontroly patří ke konkrétní URL, ne automaticky ke všem kopiím téhož názvu.
 
 ### Co je skutečně ověřené
 
-Průzkum ze 16. 10. 2026 zahrnul **144 veřejných produktových indexů Dellu** a **63 konkrétních stránek Dell Support**.
-[Audit zdrojů](catalog/dell-discovery.json) zaznamenává rozsah i stránky bez přímého ISO odkazu.
-Archiv obsahoval 141 různých názvů ISO; další byly dohledány v Dell Support. Nejde o tvrzení, že jsou veřejně dostupná všechna kdy vydaná nebo účtem chráněná ISO.
-Například u Dell ESXi 9.0 A00 se našly pouze release notes s odkazem na Broadcom; neexistující přímá URL se nevymýšlí.
+Průzkum Dellu ze 16. 10. 2026 zahrnul **144 veřejných produktových indexů** a **63 stránek Dell Support**.
+[Audit](catalog/dell-discovery.json) zaznamenává rozsah i stránky bez přímého ISO odkazu.
+Oficiální část obsahuje 176 různých názvů Dell ISO; nejde o úplný seznam všech historických nebo účtem chráněných vydání.
+Dell Support pro ESXi 9.0 A00 neposkytl přímé ISO; kopie z Digiboy proto patří do sekce třetí strany.
 
-Poslední kontrola HTTP Range + ISO9660 prošla u **11 primárních URL**. **Ostatních 181 URL vracelo z ověřovacího připojení HTTP 403**, a proto mají v menu značku **`[?]`**.
-Tyto odkazy pocházejí ze zveřejněných zdrojů, ale jejich aktuální dostupnost nelze potvrdit. Vyzkoušej je ze své sítě; výsledek může záviset na serveru nebo jeho přístupových pravidlech.
-Pokud boot selže, lze se vrátit do stejného seznamu, zopakovat pokus nebo použít jiný doložený zdroj, pokud je v katalogu uvedený.
-Původní Dell 8.0 U3 A00 z MahanServeru je zachován jako taková alternativa k primární URL Dellu.
+U všech **35 Digiboy URL** prošla kontrola HTTP Range + ISO9660. Celkem je potvrzeno **46 URL**;
+ostatní mají značku **`[?]`**. Starší kontroly ostatních zdrojů nebyly při této úpravě opakovány.
+Výsledek a dostupnost závisejí také na síti a pravidlech serveru. Kontrola čte jen 64 bytů ze sektoru ISO,
+nestahuje celé obrazy, neověřuje úplný hash a nepotvrzuje úspěšný boot.
+SHA256 zveřejněné Dellem jsou referenční metadata u oficiálních URL; `sanboot` je automaticky neověřuje.
 
-Kontrola čte jen 64 bytů ze sektoru ISO, nestahuje celé obrazy a nepotvrzuje úspěšný boot.
-U **41 obrazů** je uložený také SHA256 zveřejněný Dellem. Je to údaj pro kontrolu celého staženého souboru;
-`sanboot` ho automaticky neověřuje.
+Digiboy používá živý server, ne archivní kopii Wayback. Historický archiv může obsahovat další soubory;
+jeho obsah zatím nebyl porovnán se živým serverem.
 
 ### Boot a aktualizace katalogu
 
-ISO se čte přímo přes iPXE `sanboot`; není potřeba vlastní sestavování ani server s rozbalenými obrazy.
-Instalaci a cílový disk vybíráš v instalátoru ESXi, bez kickstartu. Zvláště u starých verzí a UEFI může mít ISO SAN boot omezení;
-alternativou je rozbalený instalátor přes HTTP (`mboot.efi`/`bootx64.efi` a `boot.cfg`).
-
-Pro MahanServer odkazy lze přepsat kořen mirroru v `boot.cfg` (bez koncového lomítka):
-
-```ipxe
-set esxi_mirror_base_url https://mirror.mahanserver.net/VMware/ESXI
-```
-
-Dell a Hausmer používají vlastní absolutní URL. Menu se automaticky neaktualizuje při každém bootu.
-Po úpravě `catalog/esxi.json` spusť standardním Pythonem, bez dalších balíčků:
+ISO se čte přes iPXE `sanboot`. Instalaci a cílový disk vybíráš v instalátoru ESXi, bez kickstartu.
+Zvláště u starších verzí a UEFI může mít ISO SAN boot omezení; alternativou je rozbalený instalátor přes HTTP.
+Menu se neaktualizuje při každém bootu. Po úpravě katalogu spusť standardním Pythonem:
 
 ```text
 python tools/esxi_catalog.py
@@ -65,17 +64,15 @@ python tools/esxi_catalog.py --check
 python -m unittest discover -s tests -v
 ```
 
-Nová síťová kontrola (malé Range požadavky, mění záznamy kontroly a přegeneruje menu):
+Aktualizace kontrol všech primárních i alternativních URL (pouze malé Range požadavky):
 
 ```text
 python tools/esxi_catalog.py --verify-network
 ```
 
-Opakovaný průzkum veřejného archivu Dellu vytvoří kandidáty v ignorovaném `.build/dell-discovery/`:
+Opakovaný průzkum veřejného archivu Dellu vytvoří kandidáty v ignorovaném `.build/dell-discovery/`,
+nemění zkontrolovaný katalog. Novější stránky Dell Support vyžadují samostatné dohledání.
 
 ```text
 python tools/discover_dell_esxi.py
 ```
-
-Tento průzkum nemění zkontrolovaný katalog. Novější Dell Support stránky vyžadují samostatné dohledání;
-část obsahuje pouze release notes a přesměrování na Broadcom.
