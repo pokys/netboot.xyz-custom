@@ -46,18 +46,18 @@ function Invoke-AdkDism {
 
 $mounted = $false
 try {
-    Invoke-AdkDism @('/Mount-Image', "/ImageFile:$image", '/Index:1', "/MountDir:$($mount.FullName)")
+    Invoke-AdkDism -DismArguments @('/Mount-Image', "/ImageFile:$image", '/Index:1', "/MountDir:$($mount.FullName)")
     $mounted = $true
     foreach ($package in $packages) {
-        Invoke-AdkDism @("/Image:$($mount.FullName)", '/Add-Package', "/PackagePath:$ocRoot\$package.cab")
+        Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Package', "/PackagePath:$ocRoot\$package.cab")
         $languageCab = Join-Path $ocRoot "en-us\${package}_en-us.cab"
         if (Test-Path -LiteralPath $languageCab) {
-            Invoke-AdkDism @("/Image:$($mount.FullName)", '/Add-Package', "/PackagePath:$languageCab")
+            Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Package', "/PackagePath:$languageCab")
         }
     }
-    Invoke-AdkDism @("/Image:$($mount.FullName)", '/Set-ScratchSpace:512')
+    Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Set-ScratchSpace:512')
     if ($DriverPath) {
-        Invoke-AdkDism @("/Image:$($mount.FullName)", '/Add-Driver', "/Driver:$([IO.Path]::GetFullPath($DriverPath))", '/Recurse')
+        Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Driver', "/Driver:$([IO.Path]::GetFullPath($DriverPath))", '/Recurse')
     }
     # Pin the PowerShell 5.1-compatible OSD implementation used by this launcher.
     # This is the standalone OSD module, not the newer OSDeploy build tooling.
@@ -67,7 +67,7 @@ try {
     $system32 = Join-Path $mount.FullName 'Windows\System32'
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\Start-Install.ps1') -Destination $system32
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\startnet.cmd') -Destination $system32
-    Invoke-AdkDism @('/Unmount-Image', "/MountDir:$($mount.FullName)", '/Commit')
+    Invoke-AdkDism -DismArguments @('/Unmount-Image', "/MountDir:$($mount.FullName)", '/Commit')
     $mounted = $false
 
     $wimboot = Join-Path $WorkPath 'wimboot'
@@ -84,6 +84,6 @@ try {
 }
 finally {
     if ($mounted) {
-        Invoke-AdkDism @('/Unmount-Image', "/MountDir:$($mount.FullName)", '/Discard')
+        Invoke-AdkDism -DismArguments @('/Unmount-Image', "/MountDir:$($mount.FullName)", '/Discard')
     }
 }

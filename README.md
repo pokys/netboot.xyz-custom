@@ -144,6 +144,11 @@ python tools/discover_dell_esxi.py
 
 ## Sestavení WinPE
 
+Bez instalace nástrojů na vlastní PC spusť v GitHubu **Actions → Build Windows installer
+boot files → Run workflow**. Workflow na dočasném Windows runneru nainstaluje ADK/WinPE,
+sestaví obraz a zveřejní `boot.wim`, `wimboot` a `SHA256SUMS` pod tagem `osdcloud`.
+Existující release nepřepisuje. Následující postup je alternativa pro lokální sestavení.
+
 Nainstaluj [Windows ADK](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install)
 (komponentu **Deployment Tools**) a odpovídající **Windows PE add-on** doporučené Microsoftem pro cílové Windows 11.
 Potřebuješ internet, několik GB volného místa a 64bitový **Windows PowerShell 5.1 jako správce**.
@@ -185,7 +190,7 @@ https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud/wimboot
 ```
 
 Po buildu vytvoř GitHub Release s tagem `osdcloud` a přilož oba soubory a `SHA256SUMS`.
-Release a binární soubory se automaticky nepublikují. Před veřejným vystavením vlastního WinPE ověř podmínky distribuce Windows ADK/WinPE.
+Při ručním sestavení se release a binární soubory automaticky nepublikují.
 
 Alternativou je assets server netboot.xyz nebo jiný HTTP(S) server v LAN. V `boot.cfg` nastav:
 
