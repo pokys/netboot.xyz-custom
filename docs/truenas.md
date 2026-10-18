@@ -66,7 +66,10 @@ Samostatná GitHub Action [test-truenas.yml](../.github/workflows/test-truenas.y
 spouští dočasnou VM s DHCP a stažením ISO přes oficiální HTTPS URL.
 Úspěch vyžaduje dosažení interaktivní nabídky `Console Setup` / `Install/Upgrade`;
 nepřipojuje žádné disky a neprovádí instalaci. Původní v1 v ní reprodukovatelně
-selhala při TLS handshake. Ověření opravené v2 probíhá.
+selhala při TLS handshake. [Opravená v2 prošla](https://github.com/pokys/netboot.xyz-custom/actions/runs/39175133472)
+19. října 2026: QEMU BIOS, 8 GB RAM, DHCP, stažení celého ISO přes HTTPS,
+úspěšné `mount-cd.service` a skutečná nabídka `TrueNAS 25.10.7 Console Setup`
+s položkou `Install/Upgrade` v sériovém logu.
 Instalace na disk, úplný iPXE start, UEFI a Secure Boot zatím nejsou ověřené.
 iPXE ani live-boot za běhu automaticky neověřují ISO proti připnutému SHA256;
 kontrola se provádí při přípravě bootovacích souborů.

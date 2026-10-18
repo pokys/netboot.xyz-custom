@@ -2,7 +2,10 @@
 # TrueNAS Community Edition installer; see docs/truenas.md.
 
 :truenas_menu
-isset ${truenas_assets} || set truenas_assets https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v1
+isset ${truenas_assets} || goto truenas_defaults
+iseq ${truenas_assets} https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v1 && clear truenas_assets ||
+:truenas_defaults
+isset ${truenas_assets} || set truenas_assets https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v2
 isset ${truenas_iso} || set truenas_iso https://download.sys.truenas.net/TrueNAS-SCALE-Goldeye/25.10.7/TrueNAS-SCALE-25.10.7.iso
 menu TrueNAS Community Edition 25.10.7 - Installer
 item --gap x86_64 - 8 GB RAM minimum; 12 GB recommended for network installation
@@ -32,7 +35,7 @@ set truenas_console console=tty0
 iseq ${arch} x86_64 || goto truenas_arch
 imgfree
 echo Loading TrueNAS installer. The full ISO (2.3 GB) is then downloaded into RAM.
-kernel ${truenas_assets}/truenas-vmlinuz initrd=truenas-initrd boot=live components ip=dhcp fetch=${truenas_iso} nomodeset ${truenas_console} || goto truenas_failed
+kernel ${truenas_assets}/truenas-vmlinuz initrd=truenas-initrd boot=live components fetch=${truenas_iso} nomodeset ${truenas_console} || goto truenas_failed
 initrd --name truenas-initrd ${truenas_assets}/truenas-initrd || goto truenas_failed
 boot || goto truenas_failed
 goto truenas_menu
