@@ -146,7 +146,9 @@ python tools/discover_dell_esxi.py
 
 Bez instalace nástrojů na vlastní PC spusť v GitHubu **Actions → Build Windows installer
 boot files → Run workflow**. Workflow na dočasném Windows runneru nainstaluje ADK/WinPE,
-sestaví obraz a zveřejní `boot.wim`, `wimboot` a `SHA256SUMS` pod tagem `osdcloud`.
+sestaví obraz a zveřejní `boot.wim`, `wimboot`, `BCD`, `boot.sdi` a `SHA256SUMS`
+pod tagem `osdcloud-v2`. Následný test zavede WinPE v dočasném BIOS VM až
+k potvrzovací výzvě OSDCloud; instalaci Windows nespouští.
 Existující release nepřepisuje. Následující postup je alternativa pro lokální sestavení.
 
 Nainstaluj [Windows ADK](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install)
@@ -162,7 +164,9 @@ Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser
 
 Build přidá do WinPE PowerShell, standalone modul **OSD 26.10.6.1** a interaktivní launcher.
 OSD obsahuje implementaci OSDCloud; nové sestavovací nástroje OSDeploy zde nejsou potřeba.
-Výstup je `artifacts/osdcloud/boot.wim`, `wimboot` a `SHA256SUMS`.
+Výstup je `artifacts/osdcloud/boot.wim`, `wimboot`, `BCD`, `boot.sdi` a `SHA256SUMS`.
+BCD a `boot.sdi` pocházejí ze stejného WinPE add-onu a iPXE je předává explicitně;
+samotný základní ADK WIM neobsahuje kompletní bootovací médium.
 **wimboot v2.9.0** se kontroluje proti pevně zadanému SHA256. Aktualizace verzí vyžaduje nové ověření a build.
 Binární obrazy a pracovní soubory Git ignoruje. Žádné Windows ISO se při buildu nestahuje.
 Build nespouští instalaci Windows ani neformátuje disk.
@@ -185,11 +189,14 @@ Pro opakovaný build zvol nové adresáře:
 Výchozí menu očekává tyto adresy:
 
 ```text
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud/boot.wim
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud/wimboot
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v2/boot.wim
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v2/wimboot
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v2/BCD
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v2/boot.sdi
 ```
 
-Po buildu vytvoř GitHub Release s tagem `osdcloud` a přilož oba soubory a `SHA256SUMS`.
+Po ručním buildu vytvoř GitHub Release s novým tagem a přilož všechny čtyři soubory
+a `SHA256SUMS`; při jiném tagu uprav URL v menu.
 Při ručním sestavení se release a binární soubory automaticky nepublikují.
 
 Alternativou je assets server netboot.xyz nebo jiný HTTP(S) server v LAN. V `boot.cfg` nastav:
@@ -198,7 +205,8 @@ Alternativou je assets server netboot.xyz nebo jiný HTTP(S) server v LAN. V `bo
 set osdcloud_base_url http://192.168.1.10:8080/osdcloud
 ```
 
-Adresář musí obsahovat `boot.wim` a `wimboot`. URL bez koncového lomítka lze změnit i v submenu Windows.
+Adresář musí obsahovat `boot.wim`, `wimboot`, `BCD` a `boot.sdi`.
+URL bez koncového lomítka lze změnit i v submenu Windows.
 GitHub HTTPS potřebuje funkční DNS a podporu HTTPS a důvěryhodných certifikátů v iPXE.
 Při problému se stažením přes GitHub otestuj LAN HTTP server.
 

@@ -1,6 +1,8 @@
 #!ipxe
 # Override this setting in boot.cfg to use your own HTTP(S) asset server.
-isset ${osdcloud_base_url} || set osdcloud_base_url https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud
+# Migrate the previous built-in default when returning without rebooting iPXE.
+iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud && clear osdcloud_base_url ||
+isset ${osdcloud_base_url} || set osdcloud_base_url https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v2
 
 :windows
 menu Windows 10 / 11 - OSDCloud installer
@@ -14,7 +16,7 @@ choose --default back osdcloud_choice || goto back
 goto ${osdcloud_choice}
 
 :url
-echo Enter the directory containing boot.wim and wimboot (no trailing slash):
+echo Enter the directory containing boot.wim, wimboot, BCD and boot.sdi (no trailing slash):
 read osdcloud_base_url || goto windows
 goto windows
 
@@ -29,6 +31,8 @@ cpuid --ext 29 || goto unsupported
 imgfree
 echo Boot platform: ${platform} - iPXE build: ${buildarch}
 kernel ${osdcloud_base_url}/wimboot || goto failed
+initrd ${osdcloud_base_url}/BCD BCD || goto failed
+initrd ${osdcloud_base_url}/boot.sdi boot.sdi || goto failed
 initrd ${osdcloud_base_url}/boot.wim boot.wim || goto failed
 boot || goto failed
 
@@ -40,7 +44,7 @@ goto windows
 
 :failed
 imgfree
-echo Could not load OSDCloud. Check the asset URL and publish boot.wim + wimboot.
+echo Could not load OSDCloud. Check that boot.wim, wimboot, BCD and boot.sdi are available.
 prompt Press any key to return... ||
 goto windows
 
