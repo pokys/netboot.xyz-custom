@@ -15,11 +15,16 @@ vybíráš a jeho přepsání potvrzuješ až v instalátoru. Menu nepředává 
 Výchozí adresář připravených souborů je GitHub Release tohoto repozitáře:
 
 ```text
-https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v1
+https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v2
 ```
 
 Obsahuje `truenas-vmlinuz`, `truenas-initrd`, `SHA256SUMS` a `source.json`.
-Kernel zůstává beze změn. Initramfs obsahuje navíc malý hook
+Kernel zůstává beze změn. Initramfs navíc používá `curl`, jeho knihovny a důvěryhodné
+CA certifikáty ze stejného ověřeného ISO. Původní BusyBox `wget` se s oficiálním
+download serverem nedohodl na TLS a start končil v nouzovém shellu.
+Downloader ověřuje certifikát serveru; při chybě stahování boot zastaví.
+Knihovny jsou oddělené v `/opt/truenas-netboot`; BusyBox se nemění.
+Initramfs obsahuje také malý hook
 [`truenas/netboot-media`](../truenas/netboot-media), který v dočasném kořeni
 instalátoru upraví `mount-cd`: ISO stažené live-bootem připojí pouze pro čtení
 do `/cdrom`. Původní skript hledá jen fyzická média a síťově stažené ISO nenajde.
@@ -30,6 +35,8 @@ Volba **Set boot assets / ISO URLs** umožňuje použít HTTP(S) server v LAN.
 Zadej adresář se dvěma bootovacími soubory a úplnou URL stejného ISO 25.10.7.
 ISO URL musí končit `.iso`, jak vyžaduje Debian live-boot.
 Linux získává síť z DHCP znovu; statická konfigurace Alpine se zde nepoužívá.
+Parametr `ip=dhcp` se nepředává: tato verze live-boot jej chybně považuje
+za statickou IP. Bez něj live-boot automaticky použije DHCP.
 
 ## Reprodukovatelná příprava
 
@@ -55,8 +62,12 @@ Velké binární soubory se ukládají do Release nebo na HTTP server, nikoli do
 Ověřeno 19. října 2026: úplné ISO proti oficiálnímu SHA256, jeho GRUB konfigurace,
 Debian live-boot podpora `fetch=` pro ISO, původní skript `mount-cd`, příprava
 kernelu a upraveného initramfs a automatické testy integrity hooku a menu.
-Spuštění lokálního QEMU zamítla automatická kontrola prostředí. Celý síťový boot,
-instalace na disk, BIOS/UEFI a Secure Boot proto zatím nejsou ověřené.
+Samostatná GitHub Action [test-truenas.yml](../.github/workflows/test-truenas.yml)
+spouští dočasnou VM s DHCP a stažením ISO přes oficiální HTTPS URL.
+Úspěch vyžaduje dosažení interaktivní nabídky `Console Setup` / `Install/Upgrade`;
+nepřipojuje žádné disky a neprovádí instalaci. Původní v1 v ní reprodukovatelně
+selhala při TLS handshake. Ověření opravené v2 probíhá.
+Instalace na disk, úplný iPXE start, UEFI a Secure Boot zatím nejsou ověřené.
 iPXE ani live-boot za běhu automaticky neověřují ISO proti připnutému SHA256;
 kontrola se provádí při přípravě bootovacích souborů.
 

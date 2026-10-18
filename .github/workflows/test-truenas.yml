@@ -20,7 +20,7 @@ jobs:
           sudo apt-get install -y --no-install-recommends qemu-system-x86
           mkdir -p artifacts
           for file in truenas-vmlinuz truenas-initrd SHA256SUMS; do
-            curl --fail --location --retry 3 --output "artifacts/$file" "https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v1/$file"
+            curl --fail --location --retry 3 --output "artifacts/$file" "https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v2/$file"
           done
           (cd artifacts && sha256sum --check SHA256SUMS)
       - name: Reach interactive installer without installing to a disk
@@ -37,7 +37,7 @@ jobs:
                      '-serial', f'file:{out}/serial.log', '-no-reboot',
                      '-nic', 'user,model=e1000', '-kernel', str(out / 'truenas-vmlinuz'),
                      '-initrd', str(out / 'truenas-initrd'), '-append',
-                     'boot=live components ip=dhcp nomodeset console=tty0 console=ttyS0,115200n8 '
+                     'boot=live components nomodeset console=tty0 console=ttyS0,115200n8 '
                      'fetch=https://download.sys.truenas.net/TrueNAS-SCALE-Goldeye/25.10.7/TrueNAS-SCALE-25.10.7.iso']
           if os.path.exists('/dev/kvm') and os.access('/dev/kvm', os.W_OK):
               command[1:1] = ['-enable-kvm']
