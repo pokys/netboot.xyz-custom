@@ -1,0 +1,77 @@
+name: TrueNAS network boot smoke test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  boot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Prepare disposable VM
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y --no-install-recommends qemu-system-x86
+          mkdir -p artifacts
+          for file in truenas-vmlinuz truenas-initrd SHA256SUMS; do
+            curl --fail --location --retry 3 --output "artifacts/$file" "https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v1/$file"
+          done
+          (cd artifacts && sha256sum --check SHA256SUMS)
+      - name: Reach interactive installer without installing to a disk
+        run: |
+          python3 - <<'PY'
+          import os
+          from pathlib import Path
+          import subprocess
+          import time
+
+          out = Path('artifacts')
+          command = ['qemu-system-x86_64', '-machine', 'q35', '-m', '8192',
+                     '-smp', '2', '-cpu', 'max', '-display', 'none',
+                     '-serial', f'file:{out}/serial.log', '-no-reboot',
+                     '-nic', 'user,model=e1000', '-kernel', str(out / 'truenas-vmlinuz'),
+                     '-initrd', str(out / 'truenas-initrd'), '-append',
+                     'boot=live components ip=dhcp nomodeset console=tty0 console=ttyS0,115200n8 '
+                     'fetch=https://download.sys.truenas.net/TrueNAS-SCALE-Goldeye/25.10.7/TrueNAS-SCALE-25.10.7.iso']
+          if os.path.exists('/dev/kvm') and os.access('/dev/kvm', os.W_OK):
+              command[1:1] = ['-enable-kvm']
+          success = False
+          with (out / 'qemu.log').open('w') as diagnostic:
+              process = subprocess.Popen(command, stdout=diagnostic, stderr=subprocess.STDOUT)
+              try:
+                  deadline = time.monotonic() + 900
+                  while process.poll() is None and time.monotonic() < deadline:
+                      log = (out / 'serial.log').read_text(errors='replace') if (out / 'serial.log').exists() else ''
+                      if 'Install/Upgrade' in log and 'Console Setup' in log:
+                          success = True
+                          break
+                      if 'ALERT!' in log or 'Kernel panic' in log or '(initramfs)' in log:
+                          break
+                      time.sleep(5)
+              finally:
+                  process.terminate()
+                  try:
+                      process.wait(timeout=15)
+                  except subprocess.TimeoutExpired:
+                      process.kill()
+                      process.wait()
+          print((out / 'serial.log').read_text(errors='replace')[-16000:])
+          print((out / 'qemu.log').read_text(errors='replace'))
+          if not success:
+              raise SystemExit('TrueNAS installer was not reached; inspect serial.log')
+          print('PASS: TrueNAS Install/Upgrade menu reached; no disks were attached.')
+          PY
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        if: always()
+        with:
+          name: truenas-boot-diagnostics
+          path: |
+            artifacts/serial.log
+            artifacts/qemu.log
+          if-no-files-found: warn
