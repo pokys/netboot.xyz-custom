@@ -213,7 +213,9 @@ set github_user pokys
 
 netboot.xyz načte `https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/custom.ipxe`.
 Vyber **Windows 10 / 11 - OSDCloud installer**, potom **Start Windows 10 / 11 installer**.
-Tato položka podporuje **x64 UEFI**.
+Tato položka zavádí x64 WinPE přes **BIOS i x64 UEFI**. V BIOS režimu ověřuje
+64bitový procesor pomocí `cpuid`, protože samotné iPXE bývá sestavené jako `i386`.
+Pro instalaci Windows 11 použij UEFI; BIOS cesta je určená zejména pro Windows 10.
 
 WinPE inicializuje síť, zobrazí disky a vyžádá potvrzení `INSTALL`.
 V OSDCloud pak vyber **Windows 10 22H2 x64** nebo požadovanou verzi **Windows 11**,

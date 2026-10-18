@@ -7,7 +7,7 @@ menu Windows 10 / 11 - OSDCloud installer
 item --gap Choose Windows 10 22H2 or a Windows 11 release in the WinPE wizard.
 item --gap Downloads Windows from Microsoft after WinPE starts.
 item --gap Installation erases the selected disk. Review it in WinPE.
-item start Start Windows 10 / 11 installer (x64 UEFI)
+item start Start Windows 10 / 11 installer (64-bit PC - BIOS or x64 UEFI)
 item url Change boot asset URL [${osdcloud_base_url}]
 item back Return to custom menu
 choose --default back osdcloud_choice || goto back
@@ -19,15 +19,22 @@ read osdcloud_base_url || goto windows
 goto windows
 
 :start
+# BIOS iPXE is commonly compiled for i386 even on a 64-bit processor.
+iseq ${platform} pcbios && goto check_cpu ||
 iseq ${platform} efi || goto unsupported
 iseq ${buildarch} x86_64 || goto unsupported
+
+:check_cpu
+cpuid --ext 29 || goto unsupported
 imgfree
+echo Boot platform: ${platform} - iPXE build: ${buildarch}
 kernel ${osdcloud_base_url}/wimboot || goto failed
 initrd ${osdcloud_base_url}/boot.wim boot.wim || goto failed
 boot || goto failed
 
 :unsupported
-echo This entry requires x64 UEFI iPXE.
+echo This entry requires a 64-bit x86 PC with BIOS or x64 UEFI iPXE.
+echo Detected platform: ${platform} - iPXE build: ${buildarch}
 prompt Press any key to return... ||
 goto windows
 
