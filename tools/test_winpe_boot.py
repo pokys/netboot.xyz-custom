@@ -6,6 +6,8 @@ or starts an OS deployment. All VM disks and logs are in .build/winpe-smoke.
 import argparse
 import hashlib
 import json
+import os
+import shutil
 import socket
 import subprocess
 import time
@@ -14,8 +16,8 @@ from pathlib import Path
 from tools.prepare_small_live import append_cpio
 
 
-def run(assets):
-    work = Path('.build/winpe-smoke').resolve()
+def run(assets, firmware='bios', memory=8192):
+    work = Path('.build/winpe-smoke' + ('-uefi' if firmware == 'uefi' else '')).resolve()
     work.mkdir(parents=True, exist_ok=False)
     for line in (assets / 'SHA256SUMS').read_text().splitlines():
         digest, name = line.split()
@@ -27,13 +29,23 @@ def run(assets):
     disk = work / 'blank-test-disk.qcow2'
     subprocess.run(['qemu-img', 'create', '-f', 'qcow2', str(disk), '32G'], check=True)
     sockpath = work / 'qmp.sock'
+    kvm = os.path.exists('/dev/kvm') and os.access('/dev/kvm', os.W_OK)
     command = [
-        'qemu-system-x86_64', '-accel', 'tcg,thread=multi', '-cpu', 'max',
-        '-smp', '2', '-m', '3072', '-kernel', str(assets / 'wimboot'),
+        'qemu-system-x86_64', '-machine', 'q35',
+        '-accel', 'kvm' if kvm else 'tcg,thread=multi', '-cpu', 'host' if kvm else 'max',
+        '-smp', '2', '-m', str(memory), '-kernel', str(assets / 'wimboot'),
         '-initrd', str(initrd), '-drive', f'file={disk},format=qcow2,if=ide',
         '-nic', 'user,model=e1000', '-vga', 'std', '-display', 'none',
         '-qmp', f'unix:{sockpath},server=on,wait=off', '-no-reboot',
     ]
+    if firmware == 'uefi':
+        code = Path('/usr/share/OVMF/OVMF_CODE_4M.fd')
+        variables = work / 'OVMF_VARS.fd'
+        shutil.copyfile('/usr/share/OVMF/OVMF_VARS_4M.fd', variables)
+        command.extend(['-drive', f'if=pflash,format=raw,readonly=on,file={code}',
+                        '-drive', f'if=pflash,format=raw,file={variables}'])
+    (work / 'configuration.txt').write_text(f'Firmware: {firmware}\nRAM: {memory} MB\nKVM: {kvm}\n')
+    print(f'Boot test: {firmware}, {memory} MB RAM, KVM={kvm}', flush=True)
     with (work / 'qemu.log').open('wb') as log:
         process = subprocess.Popen(command, stdout=log, stderr=log)
         try:
@@ -93,5 +105,7 @@ def run(assets):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('assets', type=Path)
+    parser.add_argument('--firmware', choices=('bios', 'uefi'), default='bios')
+    parser.add_argument('--memory', type=int, default=8192)
     args = parser.parse_args()
-    run(args.assets.resolve())
+    run(args.assets.resolve(), args.firmware, args.memory)

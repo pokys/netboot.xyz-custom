@@ -1,0 +1,40 @@
+name: Test published WinPE on BIOS and UEFI
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  boot:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        firmware: [bios, uefi]
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Prepare disposable VM test dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf tesseract-ocr
+          if [ -e /dev/kvm ]; then sudo chmod a+rw /dev/kvm; fi
+      - name: Download published boot files
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download osdcloud-v2 --repo "$GITHUB_REPOSITORY" --dir artifacts/osdcloud
+      - name: Boot the published image without starting a deployment
+        run: python -u -m tools.test_winpe_boot artifacts/osdcloud --firmware "${{ matrix.firmware }}" --memory 8192
+      - name: Save boot test evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: winpe-${{ matrix.firmware }}-diagnostics
+          path: |
+            .build/winpe-smoke*/*.png
+            .build/winpe-smoke*/*.txt
+            .build/winpe-smoke*/*.log
