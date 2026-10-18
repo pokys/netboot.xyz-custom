@@ -1,0 +1,55 @@
+#!ipxe
+# TrueNAS Community Edition installer; see docs/truenas.md.
+
+:truenas_menu
+isset ${truenas_assets} || set truenas_assets https://github.com/pokys/netboot.xyz-custom/releases/download/truenas-25.10.7-netboot-v1
+isset ${truenas_iso} || set truenas_iso https://download.sys.truenas.net/TrueNAS-SCALE-Goldeye/25.10.7/TrueNAS-SCALE-25.10.7.iso
+menu TrueNAS Community Edition 25.10.7 - Installer
+item --gap x86_64 - 8 GB RAM minimum; 12 GB recommended for network installation
+item --gap Install to a separate system disk; select the target in the installer
+item truenas_boot ${space} Start TrueNAS installer - DHCP
+item truenas_serial ${space} Start installer - serial console 115200
+item truenas_source ${space} Set boot assets / ISO URLs (optional LAN mirror)
+item truenas_back ${space} Return to custom menu
+choose --default truenas_back truenas_choice || goto truenas_back
+goto ${truenas_choice}
+
+:truenas_source
+echo Boot assets directory (truenas-vmlinuz and truenas-initrd):
+read truenas_assets || goto truenas_menu
+echo Full URL of the unchanged TrueNAS 25.10.7 ISO:
+read truenas_iso || goto truenas_menu
+goto truenas_menu
+
+:truenas_serial
+set truenas_console console=tty0 console=ttyS0,115200n8
+goto truenas_start
+
+:truenas_boot
+set truenas_console console=tty0
+
+:truenas_start
+iseq ${arch} x86_64 || goto truenas_arch
+imgfree
+echo Loading TrueNAS installer. The full ISO (2.3 GB) is then downloaded into RAM.
+kernel ${truenas_assets}/truenas-vmlinuz initrd=truenas-initrd boot=live components ip=dhcp fetch=${truenas_iso} nomodeset ${truenas_console} || goto truenas_failed
+initrd --name truenas-initrd ${truenas_assets}/truenas-initrd || goto truenas_failed
+boot || goto truenas_failed
+goto truenas_menu
+
+:truenas_arch
+echo This installer requires x86_64.
+prompt Press any key to return ||
+goto truenas_menu
+
+:truenas_failed
+echo Installer boot failed. Check network access, source URLs and RAM.
+prompt Press any key to return ||
+goto truenas_menu
+
+:truenas_back
+clear truenas_choice
+clear truenas_console
+clear truenas_assets
+clear truenas_iso
+exit 0

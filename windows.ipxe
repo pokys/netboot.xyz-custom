@@ -1,0 +1,41 @@
+#!ipxe
+# Override this setting in boot.cfg to use your own HTTP(S) asset server.
+isset ${osdcloud_base_url} || set osdcloud_base_url https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud
+
+:windows
+menu Windows 10 / 11 - OSDCloud installer
+item --gap Choose Windows 10 22H2 or a Windows 11 release in the WinPE wizard.
+item --gap Downloads Windows from Microsoft after WinPE starts.
+item --gap Installation erases the selected disk. Review it in WinPE.
+item start Start Windows 10 / 11 installer (x64 UEFI)
+item url Change boot asset URL [${osdcloud_base_url}]
+item back Return to custom menu
+choose --default back osdcloud_choice || goto back
+goto ${osdcloud_choice}
+
+:url
+echo Enter the directory containing boot.wim and wimboot (no trailing slash):
+read osdcloud_base_url || goto windows
+goto windows
+
+:start
+iseq ${platform} efi || goto unsupported
+iseq ${buildarch} x86_64 || goto unsupported
+imgfree
+kernel ${osdcloud_base_url}/wimboot || goto failed
+initrd ${osdcloud_base_url}/boot.wim boot.wim || goto failed
+boot || goto failed
+
+:unsupported
+echo This entry requires x64 UEFI iPXE.
+prompt Press any key to return... ||
+goto windows
+
+:failed
+imgfree
+echo Could not load OSDCloud. Check the asset URL and publish boot.wim + wimboot.
+prompt Press any key to return... ||
+goto windows
+
+:back
+exit 0

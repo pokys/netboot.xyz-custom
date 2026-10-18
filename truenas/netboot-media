@@ -1,0 +1,21 @@
+#!/bin/sh
+# initramfs-tools hook: TrueNAS's mount-cd normally scans physical devices only.
+set -eu
+case "${1:-}" in prereqs) exit 0 ;; esac
+
+if [ ! -s /run/live/medium/TrueNAS-SCALE.update ]; then
+    echo 'TrueNAS network installation media is missing' >&2
+    exit 1
+fi
+
+# Change only the temporary installer root. Keep the downloaded ISO mounted
+# through Debian live-boot so its update payload remains available to install.
+cat > "${rootmnt}/usr/sbin/mount-cd" <<'EOF'
+#!/bin/sh
+set -eu
+test -s /run/live/medium/TrueNAS-SCALE.update
+mkdir -p /cdrom
+mount --bind /run/live/medium /cdrom
+mount -o remount,bind,ro /cdrom
+EOF
+chmod 755 "${rootmnt}/usr/sbin/mount-cd"

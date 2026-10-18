@@ -1,17 +1,7 @@
-## netboot.xyz-custom
+# netboot.xyz custom menu
 
-Fork me!  This repo will allow you to create custom menus within netboot.xyz.
-It works by using your github user name that you input and chains to this URL:
-
-    https://raw.githubusercontent.com/${github_user}/netboot.xyz-custom/master/custom.ipxe
-
-Once forked, you can edit the menu as much as you want.  You can compile the iPXE image to
-set the `github_user` name early on so that your Github user name is set ahead of time and
-will automatically display your custom submenu on boot.  You can also set your Github user
-name from the Utilities menu (**Tools:** -> **Utilities** -> **netboot.xyz tools:**) which
-will cause a custom menu to appear in the main menu.
-
-If you are new to iPXE scripting, take a look at `custom.ipxe.example` and build up from that.
+Vlastní menu pro účet `pokys`. Windows 10 / 11 se instalují přes **iPXE → wimboot → WinPE → OSDCloud**.
+OSDCloud stáhne instalační obraz z Microsoftu až při nasazení. V menu je také samostatné ESXi submenu.
 
 ## Alpine Live - Tailcat-OneShot
 
@@ -152,12 +142,110 @@ nemění zkontrolovaný katalog. Novější stránky Dell Support vyžadují sam
 python tools/discover_dell_esxi.py
 ```
 
-## Ventoy LiveCD
+## Sestavení WinPE
 
-V **Live tools** vyber **Ventoy LiveCD - USB installer / updater**. Oficiální LiveCD
-**1.1.18** otevře grafický nástroj pro instalaci/aktualizaci Ventoy na ručně vybraném USB či disku.
-Používá přímo ISO z oficiálního GitHub release, bez vlastního assets serveru.
-[Zdroj, SHA256 a rozsah ověření](docs/ventoy-livecd.md).
+Nainstaluj [Windows ADK](https://learn.microsoft.com/en-us/windows-hardware/get-started/adk-install)
+(komponentu **Deployment Tools**) a odpovídající **Windows PE add-on** doporučené Microsoftem pro cílové Windows 11.
+Potřebuješ internet, několik GB volného místa a 64bitový **Windows PowerShell 5.1 jako správce**.
+Z kořene repozitáře spusť:
+
+```powershell
+# Je-li potřeba, nejprve zpřístupni NuGet provider pro Save-Module:
+Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force
+.\scripts\Build-OSDCloud.ps1
+```
+
+Build přidá do WinPE PowerShell, standalone modul **OSD 26.10.6.1** a interaktivní launcher.
+OSD obsahuje implementaci OSDCloud; nové sestavovací nástroje OSDeploy zde nejsou potřeba.
+Výstup je `artifacts/osdcloud/boot.wim`, `wimboot` a `SHA256SUMS`.
+**wimboot v2.9.0** se kontroluje proti pevně zadanému SHA256. Aktualizace verzí vyžaduje nové ověření a build.
+Binární obrazy a pracovní soubory Git ignoruje. Žádné Windows ISO se při buildu nestahuje.
+Build nespouští instalaci Windows ani neformátuje disk.
+
+Síťové a storage ovladače musí být dostupné už ve WinPE. Chybějící rozbalené podepsané x64 INF ovladače přidej takto:
+
+```powershell
+.\scripts\Build-OSDCloud.ps1 -DriverPath C:\Drivers\WinPE
+```
+
+Skript odmítne přepsat existující `boot.wim` nebo použít existující pracovní adresář.
+Pro opakovaný build zvol nové adresáře:
+
+```powershell
+.\scripts\Build-OSDCloud.ps1 -WorkPath C:\OSDCloudBuild\build2 -OutputPath C:\OSDCloudBuild\output2
+```
+
+## Vystavení bootovacích souborů
+
+Výchozí menu očekává tyto adresy:
+
+```text
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud/boot.wim
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud/wimboot
+```
+
+Po buildu vytvoř GitHub Release s tagem `osdcloud` a přilož oba soubory a `SHA256SUMS`.
+Release a binární soubory se automaticky nepublikují. Před veřejným vystavením vlastního WinPE ověř podmínky distribuce Windows ADK/WinPE.
+
+Alternativou je assets server netboot.xyz nebo jiný HTTP(S) server v LAN. V `boot.cfg` nastav:
+
+```ipxe
+set osdcloud_base_url http://192.168.1.10:8080/osdcloud
+```
+
+Adresář musí obsahovat `boot.wim` a `wimboot`. URL bez koncového lomítka lze změnit i v submenu Windows.
+GitHub HTTPS potřebuje funkční DNS a podporu HTTPS a důvěryhodných certifikátů v iPXE.
+Při problému se stažením přes GitHub otestuj LAN HTTP server.
+
+## Zapojení do netboot.xyz
+
+Po publikování změn na větev `master` nastav v netboot.xyz přes **Utilities → netboot.xyz tools** GitHub uživatele `pokys`.
+Případně jej nastav předem v konfiguraci:
+
+```ipxe
+set github_user pokys
+```
+
+netboot.xyz načte `https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/custom.ipxe`.
+Vyber **Windows 10 / 11 - OSDCloud installer**, potom **Start Windows 10 / 11 installer**.
+Tato položka podporuje **x64 UEFI**.
+
+WinPE inicializuje síť, zobrazí disky a vyžádá potvrzení `INSTALL`.
+V OSDCloud pak vyber **Windows 10 22H2 x64** nebo požadovanou verzi **Windows 11**,
+edici a jazyk (`cs-cz` pro češtinu). Windows 10 i 11 používají stejné WinPE a wimboot;
+instalační obraz se stahuje z Microsoftu až po výběru v průvodci.
+Nabídka dostupných Windows 11 vydání závisí na katalogu připnuté verze modulu OSD.
+Windows 7 a 8.1 nejsou do tohoto OSDCloud menu přidané.
+Ověř cílový disk v instalačních výzvách OSDCloud: jeho potvrzením povoluješ vymazání dat.
+Projekt nepředává `ZTI` a sám disk nevybírá ani nemaže. Nejde o klasického průvodce `setup.exe`, ale o nasazení obrazu Windows.
+
+## Kontrola a první boot
+
+```powershell
+.\scripts\Test-Configuration.ps1
+```
+
+Kontrola ověřuje syntaxi PowerShellu, cíle iPXE menu a ochrany launcheru pomocí mocků.
+Neprovádí sestavení WIM, síťový boot ani instalaci Windows.
+První úplný test proveď ve VM s x64 UEFI, funkční sítí a prázdným virtuálním diskem.
+Secure Boot vyžaduje kompatibilní a důvěryhodný celý bootovací řetězec; samotný wimboot jeho funkčnost nezaručuje.
+Při problému se sítí zkontroluj `ipconfig`, při chybějícím disku doplň ovladače a znovu sestav obraz.
+
+## Zdroje
+
+- [iPXE: wimboot a WinPE přes HTTP](https://ipxe.org/wimboot)
+- [Microsoft: závislosti WinPE optional components](https://learn.microsoft.com/en-us/windows-hardware/manufacture/desktop/winpe-add-packages--optional-components-reference)
+- [OSD: OSDCloud a interaktivní GUI](https://github.com/OSDeploy/OSD)
+- [OSDCloud: výběr operačního systému, edice a jazyka](https://www.osdcloud.com/osdcloud-v1/osdcloud/deployment/winpe/start-osdcloudgui)
+- [Microsoft: instalační média Windows 10](https://www.microsoft.com/en-us/software-download/windows10)
+
+## TrueNAS Community Edition
+
+V **Storage / NAS → TrueNAS Community Edition - Installer** je síťový instalátor
+**25.10.7**, zaváděný přímo přes iPXE kernel/initramfs. Linux přes DHCP stáhne
+oficiální ISO do RAM; doporučeno 12 GB RAM (minimum 8 GB).
+Cílový systémový disk vybíráš až v interaktivním instalátoru.
+[Příprava souborů a rozsah ověření](docs/truenas.md).
 
 ## Puppy Linux a Slax
 
