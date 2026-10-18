@@ -19,7 +19,8 @@ $ocRoot = Join-Path $peRoot 'WinPE_OCs'
 $dism = Join-Path $AdkRoot 'Deployment Tools\amd64\DISM\dism.exe'
 # Dependency order is required by Microsoft WinPE optional components.
 $packages = @('WinPE-WMI', 'WinPE-NetFX', 'WinPE-Scripting', 'WinPE-PowerShell', 'WinPE-StorageWMI', 'WinPE-DismCmdlets', 'WinPE-HTA', 'WinPE-SecureStartup')
-foreach ($required in @($sourceWim, $dism) + @($packages | ForEach-Object { Join-Path $ocRoot "$_.cab" })) {
+$bootFiles = @{ 'BCD' = (Join-Path $peRoot 'Media\Boot\BCD'); 'boot.sdi' = (Join-Path $peRoot 'Media\Boot\boot.sdi') }
+foreach ($required in @($sourceWim, $dism) + @($bootFiles.Values) + @($packages | ForEach-Object { Join-Path $ocRoot "$_.cab" })) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
         throw "Missing ADK/WinPE component: $required. Install Deployment Tools and the matching WinPE add-on."
     }
@@ -75,9 +76,14 @@ try {
     $expected = '5f067ccdc4d084d5bf77b6c853bd0f8402dfc2b4cd1b103d358993ae97fae8e3'
     if ((Get-FileHash -LiteralPath $wimboot -Algorithm SHA256).Hash -ne $expected) { throw 'wimboot SHA256 mismatch.' }
     Copy-Item -LiteralPath $wimboot -Destination $OutputPath
+    # The base ADK WIM is not complete installation media: its BCD and SDI
+    # are separate files. Supply both explicitly to wimboot.
+    foreach ($name in $bootFiles.Keys) {
+        Copy-Item -LiteralPath $bootFiles[$name] -Destination (Join-Path $OutputPath $name)
+    }
     # Publish the WIM last, so incomplete builds do not look ready to boot.
     Copy-Item -LiteralPath $image -Destination $OutputPath
-    Get-ChildItem -LiteralPath $OutputPath -File | Where-Object Name -in @('boot.wim', 'wimboot') |
+    Get-ChildItem -LiteralPath $OutputPath -File | Where-Object Name -in @('boot.wim', 'wimboot', 'BCD', 'boot.sdi') |
         Get-FileHash -Algorithm SHA256 | ForEach-Object { '{0}  {1}' -f $_.Hash.ToLowerInvariant(), [IO.Path]::GetFileName($_.Path) } |
         Set-Content -LiteralPath (Join-Path $OutputPath 'SHA256SUMS') -Encoding Ascii
     Write-Host "Boot assets ready: $OutputPath"
