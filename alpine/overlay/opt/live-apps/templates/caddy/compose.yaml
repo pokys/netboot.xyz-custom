@@ -1,0 +1,15 @@
+services:
+  caddy:
+    image: caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
+    restart: unless-stopped
+    mem_limit: 128m
+    ports: ["8081:80"]
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - ./www:/srv:ro
+      - data:/data
+      - config:/config
+volumes:
+  data:
+  config:

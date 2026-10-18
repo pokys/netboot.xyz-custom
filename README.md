@@ -167,3 +167,16 @@ Připravené bootovací soubory jsou v GitHub Releases tohoto repozitáře;
 Slax si navíc načítá ISO z mirroru ČVUT. V původním netboot.xyz tyto dvě distribuce nejsou.
 Obě prostředí prošla bootem až na desktop v QEMU bez disku.
 [Zdroje, příprava a rozsah ověření](docs/puppy-slax.md).
+
+## Alpine Live - App appliances
+
+V **Live tools → Alpine Live - App appliances** lze před bootem zaškrtnout
+**Nextcloud, Copyparty, Wastebin, Semaphore UI, Caddy, Uptime Kuma, Apache Guacamole**
+a navíc **IT-Tools**. Společný Alpine základ vždy připraví Docker, Dockge a SSH;
+jednotlivé aplikace jsou samostatné Compose stacky v Dockge. Funguje výběr Alpine větve
+i DHCP / statická IPv4. Prázdný výběr spustí původní Docker lab.
+
+Vše je dočasné v RAM, včetně databází, uploadů a účtů. Pro lehký výběr doporučeně
+8 GB RAM, pro celý výběr 16 GB. Přístupové adresy a náhodné heslo se zobrazí na konzoli;
+podrobnosti lze vypsat přes SSH příkazem `live-apps status`.
+[Porty, správa, zdroje a ověření](docs/alpine-apps.md).

@@ -1,0 +1,13 @@
+services:
+  copyparty:
+    image: copyparty/ac:latest@sha256:b2054d65e05daa8982ca17c26b12b74315c0ce586a03ff9018a59c80731b9e19
+    restart: unless-stopped
+    mem_limit: 512m
+    ports: ["3923:3923"]
+    command: ["--wram", "-a", "admin:${APP_PASSWORD:?}", "-v", "/w::rwmd,admin"]
+    volumes:
+      - files:/w
+      - config:/cfg
+volumes:
+  files:
+  config:

@@ -1,0 +1,23 @@
+services:
+  semaphore:
+    image: semaphoreui/semaphore:v2.19.16@sha256:3707a971a57fdc5ac99a184bf83f2efb7d00cbeec8fb08a16a8028f77229e141
+    restart: unless-stopped
+    mem_limit: 1024m
+    ports: ["3000:3000"]
+    environment:
+      SEMAPHORE_DB_DIALECT: sqlite
+      SEMAPHORE_DB: /var/lib/semaphore/database.sqlite
+      SEMAPHORE_ADMIN: admin
+      SEMAPHORE_ADMIN_NAME: Temporary admin
+      SEMAPHORE_ADMIN_EMAIL: admin@example.invalid
+      SEMAPHORE_ADMIN_PASSWORD: ${APP_PASSWORD:?}
+      SEMAPHORE_ACCESS_KEY_ENCRYPTION: ${ENCRYPTION_KEY:?}
+      SEMAPHORE_PLAYBOOK_PATH: /tmp/semaphore
+    volumes:
+      - data:/var/lib/semaphore
+      - config:/etc/semaphore
+      - playbooks:/tmp/semaphore
+volumes:
+  data:
+  config:
+  playbooks:

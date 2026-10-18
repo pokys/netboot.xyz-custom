@@ -2,6 +2,7 @@
 # Alpine diskless Docker + Dockge + SSH. Everything is stored in RAM.
 
 :alpine_docker_menu
+isset ${alpine_live_apps} || set alpine_live_apps none
 menu Alpine Live - Docker + Dockge + SSH
 item --gap Temporary x86_64 environment - 8 GB RAM recommended
 item alpine_docker_pinned ${space} Alpine 3.24 - Fixed release branch
@@ -59,7 +60,7 @@ set alpine_live_base https://dl-cdn.alpinelinux.org/alpine/${alpine_live_branch}
 set alpine_live_repo https://dl-cdn.alpinelinux.org/alpine/${alpine_live_branch}/main,https://dl-cdn.alpinelinux.org/alpine/${alpine_live_branch}/community
 set alpine_live_overlay https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/alpine/docker-live.apkovl.tar.gz
 imgfree
-kernel ${alpine_live_base}/vmlinuz-lts ${alpine_live_ipparam} BOOTIF=01-${netX/mac:hexhyp} modules=loop,squashfs alpine_repo=${alpine_live_repo} modloop=${alpine_live_base}/modloop-lts apkovl=${alpine_live_overlay} rootflags=size=85% nomodeset || goto alpine_docker_failed
+kernel ${alpine_live_base}/vmlinuz-lts ${alpine_live_ipparam} BOOTIF=01-${netX/mac:hexhyp} modules=loop,squashfs alpine_repo=${alpine_live_repo} modloop=${alpine_live_base}/modloop-lts apkovl=${alpine_live_overlay} live_apps=${alpine_live_apps} rootflags=size=85% nomodeset || goto alpine_docker_failed
 initrd ${alpine_live_base}/initramfs-lts || goto alpine_docker_failed
 echo Starting temporary Docker lab. SSH credentials will appear on the console.
 boot || goto alpine_docker_failed

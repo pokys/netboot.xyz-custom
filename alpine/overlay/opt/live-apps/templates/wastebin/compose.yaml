@@ -1,0 +1,31 @@
+services:
+  init-data:
+    image: caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
+    mem_limit: 64m
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["chown 10001:10001 /data && chmod 700 /data"]
+    volumes:
+      - data:/data
+  wastebin:
+    image: quxfoo/wastebin:3.9.0@sha256:d441b009827b896b67d7df5d7bf849cc5cff970c505cb50d72c946c3d3fd0a5e
+    restart: unless-stopped
+    mem_limit: 128m
+    environment:
+      WASTEBIN_DATABASE_PATH: /data/state.db
+      WASTEBIN_PASSWORD_SALT: ${DB_PASSWORD:?}
+      WASTEBIN_TITLE: Temporary Wastebin
+    volumes:
+      - data:/data
+    depends_on:
+      init-data:
+        condition: service_completed_successfully
+  gateway:
+    image: caddy:2-alpine@sha256:d8542f48d34a9cf4e4c11a478865229840e87e4c96ea3f439101f31a5d35f75f
+    restart: unless-stopped
+    mem_limit: 128m
+    ports: ["8088:80"]
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+    depends_on: [wastebin]
+volumes:
+  data:

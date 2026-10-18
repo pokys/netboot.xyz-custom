@@ -1,0 +1,162 @@
+#!/bin/sh
+# Temporary Compose appliances. All state, including secrets, stays in RAM.
+set -eu
+set -f
+umask 077
+
+templates=/opt/live-apps/templates
+state=/run/docker-live
+mkdir -p "$state" /opt/stacks
+
+valid_app() {
+    case "$1" in nextcloud|copyparty|wastebin|semaphore|caddy|uptime-kuma|guacamole|it-tools) return 0 ;; *) return 1 ;; esac
+}
+
+port_for() {
+    case "$1" in
+        nextcloud) echo 8080 ;; copyparty) echo 3923 ;; wastebin) echo 8088 ;;
+        semaphore) echo 3000 ;; caddy) echo 8081 ;; uptime-kuma) echo 3001 ;;
+        guacamole) echo 8082 ;; it-tools) echo 8083 ;;
+    esac
+}
+
+compose() { docker compose --ansi never --progress plain --project-directory "$directory" "$@"; }
+
+refresh_report() {
+    : > "$state/apps-access.txt"
+    for name in nextcloud copyparty wastebin semaphore caddy uptime-kuma guacamole it-tools; do
+        [ ! -f "$state/app-$name.txt" ] || cat "$state/app-$name.txt" >> "$state/apps-access.txt"
+    done
+}
+
+prepare() {
+    mkdir -p "$directory"
+    if [ ! -f "$directory/compose.yaml" ]; then
+        cp "$templates/$app/compose.yaml" "$directory/compose.yaml"
+    fi
+    if [ ! -s "$directory/.env" ]; then
+        domains="localhost 127.0.0.1 $(hostname)"
+        for address in $(live-addresses); do
+            domains="$domains $address"
+        done
+        {
+            printf 'APP_PASSWORD=%s\n' "$password"
+            printf 'DB_PASSWORD=%s\n' "$(openssl rand -hex 24)"
+            printf 'ENCRYPTION_KEY=%s\n' "$(openssl rand -base64 32)"
+            printf 'TRUSTED_DOMAINS="%s"\n' "$domains"
+        } > "$directory/.env"
+    fi
+    case "$app" in
+        caddy|wastebin)
+            if [ ! -s "$directory/Caddyfile" ]; then
+                image=$(awk '/image:.*caddy:/ {print $2; exit}' "$templates/$app/compose.yaml")
+                hash=$(docker run --rm --entrypoint caddy "$image" hash-password --plaintext "$password") || return 1
+                {
+                    printf ':80 {\n    basic_auth {\n        admin %s\n    }\n' "$hash"
+                    if [ "$app" = caddy ]; then
+                        printf '    root * /srv\n    file_server browse\n'
+                    else
+                        printf '    reverse_proxy wastebin:8088\n'
+                    fi
+                    printf '}\n'
+                } > "$directory/Caddyfile"
+            fi
+            if [ "$app" = caddy ]; then
+                mkdir -p "$directory/www"
+                [ -f "$directory/www/index.html" ] || printf '<h1>Temporary Caddy</h1><p>Edit /opt/stacks/caddy/Caddyfile and www/ in this RAM-only appliance.</p>\n' > "$directory/www/index.html"
+            fi
+            ;;
+        guacamole)
+            if [ ! -s "$directory/initdb.sql" ]; then
+                image=$(awk '/image:.*guacamole\/guacamole:/ {print $2; exit}' "$templates/$app/compose.yaml")
+                docker run --rm "$image" /opt/guacamole/bin/initdb.sh --postgresql > "$directory/initdb.sql.tmp" || return 1
+                # Replace the upstream default password before the DB becomes ready.
+                # Guacamole hashes password + uppercase hexadecimal salt text.
+                salt=$(openssl rand -hex 32 | tr 'a-f' 'A-F')
+                hash=$(printf '%s%s' "$password" "$salt" | openssl dgst -sha256 | awk '{print $NF}')
+                printf "\nUPDATE guacamole_user SET password_hash=decode('%s','hex'), password_salt=decode('%s','hex'), password_date=CURRENT_TIMESTAMP WHERE entity_id=(SELECT entity_id FROM guacamole_entity WHERE name='guacadmin' AND type='USER');\n" "$hash" "$salt" >> "$directory/initdb.sql.tmp"
+                mv "$directory/initdb.sql.tmp" "$directory/initdb.sql"
+                chmod 644 "$directory/initdb.sql"
+            fi
+            ;;
+    esac
+}
+
+wait_ready() {
+    port=$(port_for "$app")
+    attempt=0
+    while [ "$attempt" -lt 120 ]; do
+        attempt=$((attempt + 1))
+        case "$app" in
+            caddy|wastebin) curl -fsS --max-time 5 -u "admin:$password" "http://127.0.0.1:$port/" > "$state/probe.tmp" 2>/dev/null && return 0 ;;
+            nextcloud) curl -fsS --max-time 5 "http://127.0.0.1:$port/status.php" > "$state/probe.tmp" 2>/dev/null && grep -q '"installed":true' "$state/probe.tmp" && return 0 ;;
+            guacamole) curl -fsS --max-time 5 --data-urlencode username=guacadmin --data-urlencode "password=$password" "http://127.0.0.1:$port/guacamole/api/tokens" > "$state/probe.tmp" 2>/dev/null && grep -q '"authToken"' "$state/probe.tmp" && return 0 ;;
+            semaphore) curl -fsS --max-time 5 -H 'Content-Type: application/json' -d "{\"auth\":\"admin\",\"password\":\"$password\"}" "http://127.0.0.1:$port/api/auth/login" > "$state/probe.tmp" 2>/dev/null && return 0 ;;
+            *) curl -fsSL --max-time 5 "http://127.0.0.1:$port/" > "$state/probe.tmp" 2>/dev/null && return 0 ;;
+        esac
+        sleep 2
+    done
+    return 1
+}
+
+command=${1:-status}
+case "$command" in
+    status)
+        cat "$state/apps-access.txt" 2>/dev/null || echo 'No applications started yet.'
+        docker compose ls
+        exit 0
+        ;;
+    start|stop) ;;
+    *) echo 'Usage: live-apps status | start [comma-separated apps] | stop app[,app...]' >&2; exit 2 ;;
+esac
+
+selection=${2:-}
+if [ -z "$selection" ]; then
+    for argument in $(cat /proc/cmdline); do
+        case "$argument" in live_apps=*) selection=${argument#live_apps=} ;; esac
+    done
+fi
+case "$selection" in *[!a-z0-9,-]*) echo 'Invalid application selection' >&2; exit 2 ;; esac
+# Validate the whole selection before starting/stopping any service.
+for app in $(printf '%s' "$selection" | tr ',' ' '); do
+    [ "$app" = none ] || valid_app "$app" || { echo "Unknown application: $app" >&2; exit 2; }
+done
+
+password=$(cat "$state/ssh-password")
+failed=0
+for app in $(printf '%s' "$selection" | tr ',' '\n' | awk '!seen[$0]++'); do
+    [ "$app" = none ] && continue
+    directory=/opt/stacks/$app
+    if [ "$command" = stop ]; then
+        [ ! -f "$directory/compose.yaml" ] || compose down
+        rm -f "$state/app-$app.txt"
+        refresh_report
+        continue
+    fi
+    echo "Starting temporary $app stack..."
+    # Run in a subshell so failures cannot stop other selected appliances or SSH.
+    if (prepare && compose config --quiet && compose up -d && wait_ready); then
+        result=ready
+    else
+        result=FAILED
+        failed=1
+    fi
+    {
+        printf '%s: %s\n' "$app" "$result"
+        for address in $(live-addresses); do
+            suffix=/
+            [ "$app" != guacamole ] || suffix=/guacamole/
+            printf '  http://%s:%s%s\n' "$address" "$(port_for "$app")" "$suffix"
+        done
+        case "$app" in
+            guacamole) printf '  User: guacadmin | Password: %s\n' "$password" ;;
+            uptime-kuma) echo '  Create an account on first visit.' ;;
+            it-tools) echo '  Browser utilities; no account needed.' ;;
+            *) printf '  User: admin | Password: %s\n' "$password" ;;
+        esac
+        printf '  Stack: %s | Data disappears on reboot.\n' "$directory"
+    } > "$state/app-$app.txt"
+    refresh_report
+    cat "$state/app-$app.txt" > /dev/console
+done
+exit "$failed"

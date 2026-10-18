@@ -1,0 +1,10 @@
+services:
+  uptime-kuma:
+    image: louislam/uptime-kuma:2.5.6@sha256:9912da7d7d9b6ddc0c2d904beb84d24689c1ed9c33b81419eb9008663a92a329
+    restart: unless-stopped
+    mem_limit: 768m
+    ports: ["3001:3001"]
+    volumes:
+      - data:/app/data
+volumes:
+  data:

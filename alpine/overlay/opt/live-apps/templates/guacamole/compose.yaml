@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:16-alpine@sha256:721873c34ceb9f8d8fc265984940dc982404c105f19ad51be9fdc5970a6080ea
+    restart: unless-stopped
+    mem_limit: 384m
+    environment:
+      POSTGRES_USER: guacamole
+      POSTGRES_DB: guacamole
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?}
+    volumes:
+      - db:/var/lib/postgresql/data
+      - ./initdb.sql:/docker-entrypoint-initdb.d/10-guacamole.sql:ro
+    healthcheck:
+      test: [CMD-SHELL, "pg_isready -h 127.0.0.1 -U guacamole -d guacamole"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+  guacd:
+    image: guacamole/guacd:1.6.0@sha256:8974eaa9ba32f713daf311e7cc8cd7e4cdfba1edea39eed75524e78ef4b08f4f
+    restart: unless-stopped
+    mem_limit: 512m
+  guacamole:
+    image: guacamole/guacamole:1.6.0@sha256:f344085e618bb05e22b964b0208dbd06d3468275bac70206f93805245e067b40
+    restart: unless-stopped
+    mem_limit: 768m
+    ports: ["8082:8080"]
+    environment:
+      GUACD_HOSTNAME: guacd
+      POSTGRESQL_ENABLED: "true"
+      POSTGRESQL_HOSTNAME: db
+      POSTGRESQL_DATABASE: guacamole
+      POSTGRESQL_USERNAME: guacamole
+      POSTGRESQL_PASSWORD: ${DB_PASSWORD:?}
+    depends_on:
+      db:
+        condition: service_healthy
+      guacd:
+        condition: service_started
+volumes:
+  db:

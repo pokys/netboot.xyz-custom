@@ -1,0 +1,137 @@
+#!ipxe
+# Select temporary applications; Docker, Dockge and SSH are always included.
+
+set live_pick_nextcloud [-]
+set live_pick_copyparty [-]
+set live_pick_wastebin [-]
+set live_pick_semaphore [-]
+set live_pick_caddy [-]
+set live_pick_uptime_kuma [-]
+set live_pick_guacamole [-]
+set live_pick_it_tools [-]
+set live_picker_choice apps_nextcloud
+
+:apps_menu
+menu Alpine Live - Select temporary applications
+item --gap [x] selected / [-] off - everything disappears on reboot
+item --gap 8 GB RAM for light stacks; 16 GB recommended for all apps
+item apps_nextcloud ${live_pick_nextcloud} Nextcloud - files, calendar and collaboration (heavy)
+item apps_copyparty ${live_pick_copyparty} Copyparty - temporary authenticated file share
+item apps_wastebin ${live_pick_wastebin} Wastebin - private pastebin
+item apps_semaphore ${live_pick_semaphore} Semaphore UI - Ansible and automation
+item apps_caddy ${live_pick_caddy} Caddy - HTTP file server / editable reverse proxy
+item apps_uptime_kuma ${live_pick_uptime_kuma} Uptime Kuma - service monitoring
+item apps_guacamole ${live_pick_guacamole} Apache Guacamole - browser RDP / SSH / VNC (heavy)
+item apps_it_tools ${live_pick_it_tools} IT-Tools - browser utilities
+item apps_start ${space} Continue - choose Alpine version and network
+item apps_clear ${space} Clear selection
+item apps_back ${space} Return to custom menu
+choose --default ${live_picker_choice} live_picker_choice || goto apps_back
+goto ${live_picker_choice}
+
+:apps_nextcloud
+iseq ${live_pick_nextcloud} [x] && goto apps_nextcloud_off ||
+set live_pick_nextcloud [x]
+goto apps_menu
+:apps_nextcloud_off
+set live_pick_nextcloud [-]
+goto apps_menu
+
+:apps_copyparty
+iseq ${live_pick_copyparty} [x] && goto apps_copyparty_off ||
+set live_pick_copyparty [x]
+goto apps_menu
+:apps_copyparty_off
+set live_pick_copyparty [-]
+goto apps_menu
+
+:apps_wastebin
+iseq ${live_pick_wastebin} [x] && goto apps_wastebin_off ||
+set live_pick_wastebin [x]
+goto apps_menu
+:apps_wastebin_off
+set live_pick_wastebin [-]
+goto apps_menu
+
+:apps_semaphore
+iseq ${live_pick_semaphore} [x] && goto apps_semaphore_off ||
+set live_pick_semaphore [x]
+goto apps_menu
+:apps_semaphore_off
+set live_pick_semaphore [-]
+goto apps_menu
+
+:apps_caddy
+iseq ${live_pick_caddy} [x] && goto apps_caddy_off ||
+set live_pick_caddy [x]
+goto apps_menu
+:apps_caddy_off
+set live_pick_caddy [-]
+goto apps_menu
+
+:apps_uptime_kuma
+iseq ${live_pick_uptime_kuma} [x] && goto apps_uptime_kuma_off ||
+set live_pick_uptime_kuma [x]
+goto apps_menu
+:apps_uptime_kuma_off
+set live_pick_uptime_kuma [-]
+goto apps_menu
+
+:apps_guacamole
+iseq ${live_pick_guacamole} [x] && goto apps_guacamole_off ||
+set live_pick_guacamole [x]
+goto apps_menu
+:apps_guacamole_off
+set live_pick_guacamole [-]
+goto apps_menu
+
+:apps_it_tools
+iseq ${live_pick_it_tools} [x] && goto apps_it_tools_off ||
+set live_pick_it_tools [x]
+goto apps_menu
+:apps_it_tools_off
+set live_pick_it_tools [-]
+goto apps_menu
+
+:apps_start
+set alpine_live_apps none
+iseq ${live_pick_nextcloud} [x] && set alpine_live_apps ${alpine_live_apps},nextcloud ||
+iseq ${live_pick_copyparty} [x] && set alpine_live_apps ${alpine_live_apps},copyparty ||
+iseq ${live_pick_wastebin} [x] && set alpine_live_apps ${alpine_live_apps},wastebin ||
+iseq ${live_pick_semaphore} [x] && set alpine_live_apps ${alpine_live_apps},semaphore ||
+iseq ${live_pick_caddy} [x] && set alpine_live_apps ${alpine_live_apps},caddy ||
+iseq ${live_pick_uptime_kuma} [x] && set alpine_live_apps ${alpine_live_apps},uptime-kuma ||
+iseq ${live_pick_guacamole} [x] && set alpine_live_apps ${alpine_live_apps},guacamole ||
+iseq ${live_pick_it_tools} [x] && set alpine_live_apps ${alpine_live_apps},it-tools ||
+echo Selected applications: ${alpine_live_apps}
+chain --autofree https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/alpine-docker.ipxe || goto apps_failed
+goto apps_menu
+
+:apps_failed
+echo Could not load Alpine Docker menu.
+prompt Press any key to return ||
+goto apps_menu
+
+:apps_clear
+set live_pick_nextcloud [-]
+set live_pick_copyparty [-]
+set live_pick_wastebin [-]
+set live_pick_semaphore [-]
+set live_pick_caddy [-]
+set live_pick_uptime_kuma [-]
+set live_pick_guacamole [-]
+set live_pick_it_tools [-]
+goto apps_menu
+
+:apps_back
+clear alpine_live_apps
+clear live_picker_choice
+clear live_pick_nextcloud
+clear live_pick_copyparty
+clear live_pick_wastebin
+clear live_pick_semaphore
+clear live_pick_caddy
+clear live_pick_uptime_kuma
+clear live_pick_guacamole
+clear live_pick_it_tools
+exit 0
