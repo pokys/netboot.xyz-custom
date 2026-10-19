@@ -65,6 +65,9 @@ try {
     $modules = Join-Path $mount.FullName 'Program Files\WindowsPowerShell\Modules'
     New-Item -ItemType Directory -Path $modules -Force | Out-Null
     Save-Module -Name OSD -RequiredVersion '26.10.6.1' -Repository PSGallery -Path $modules -Force
+    & python -m tools.test_osd_web_download (Join-Path $modules 'OSD\26.10.6.1') --work-path (Join-Path $WorkPath 'download-regression')
+    if ($LASTEXITCODE -ne 0) { throw 'OSD WebClient download regression test failed.' }
+    & (Join-Path $PSScriptRoot '..\winpe\Repair-OSDWebDownload.ps1') -ModuleRoot (Join-Path $modules 'OSD\26.10.6.1')
     # WinPE's optional PowerShell component alone cannot load PowerShellGet.
     # Include its complete PS 5.1 dependencies and an offline NuGet provider.
     Save-Module -Name PackageManagement -RequiredVersion '1.4.8.1' -Repository PSGallery -Path $modules -Force

@@ -24,17 +24,21 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
         with (assets / name).open('rb') as source:
             assert hashlib.file_digest(source, 'sha256').hexdigest() == digest
     network_probe_received = threading.Event()
+    osd_download_received = threading.Event()
 
     class BootFileHandler(SimpleHTTPRequestHandler):
         def do_GET(self):
             super().do_GET()
             if self.path == '/network-probe.txt':
                 network_probe_received.set()
+            if self.path == '/download-probe.txt':
+                osd_download_received.set()
 
     server = ThreadingHTTPServer(('127.0.0.1', 0), partial(BootFileHandler, directory=str(assets)))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     base = f'http://10.0.2.2:{server.server_port}'
     (assets / 'network-probe.txt').write_text('WINPE-NETWORK-POWERSHELLGET-PASS')
+    (assets / 'download-probe.txt').write_text('WINPE-OSD-DOWNLOAD-PASS')
     tftp = work / 'tftp'
     tftp.mkdir()
     script = (f'#!ipxe\ndhcp || goto failed\nkernel {base}/wimboot || goto failed\n' +
@@ -116,6 +120,7 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
                     symbols = {' ': 'spc', '-': 'minus', '.': 'dot', '/': 'slash',
                                ':': 'shift-semicolon', ';': 'semicolon', '"': 'shift-apostrophe',
                                '|': 'shift-backslash'}
+                    symbols.update({'$': 'shift-4', "'": 'apostrophe', '=': 'equal'})
                     for character in text:
                         key = symbols.get(character, character)
                         qmp('human-monitor-command', {'command-line': f'sendkey {key} 20'})
@@ -139,15 +144,19 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
                         # Getting this far proves Get-Disk saw the only attached test disk.
                         qmp('human-monitor-command', {'command-line': 'sendkey ret'})
                         time.sleep(2)
-                        type_command('powershell -nop -ep bypass -c "import-module powershellget -requiredversion 2.2.5 -ea stop; '
+                        type_command('powershell -nop -ep bypass -c "$erroractionpreference=\'stop\'; '
+                                     'import-module powershellget -requiredversion 2.2.5 -ea stop; '
                                      'import-packageprovider nuget -minimumversion 2.8.5.201 -ea stop | out-null; '
                                      'find-module osd -requiredversion 26.10.6.1 -ea stop | out-null; '
+                                     'import-module osd -requiredversion 26.10.6.1 -ea stop; '
+                                     f'save-webfile -sourceurl {base}/download-probe.txt '
+                                     '-destinationdirectory x:/osd-smoke -destinationname probe.txt -webclient -ea stop | out-null; '
                                      f'irm {base}/network-probe.txt"')
                         probe_started = True
                     # Use the actual HTTP request rather than OCR of its result.
                     # Small console glyphs can turn WINPE into JINPE in Tesseract.
-                    if probe_started and network_probe_received.is_set():
-                        print('PASS: Test disk visible, HTTP networking and PowerShellGet/NuGet/Find-Module work. No deployment started.', flush=True)
+                    if probe_started and network_probe_received.is_set() and osd_download_received.is_set():
+                        print('PASS: Test disk visible, HTTP networking, PowerShellGet/NuGet/Find-Module and OSD WebClient download work. No deployment started.', flush=True)
                         return
                     if not probe_started and 'returned to winpe' in normalized:
                         raise RuntimeError('WinPE launcher failed before its confirmation prompt; see screenshot')

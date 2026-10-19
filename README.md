@@ -147,7 +147,7 @@ python tools/discover_dell_esxi.py
 Bez instalace nástrojů na vlastní PC spusť v GitHubu **Actions → Build Windows installer
 boot files → Run workflow**. Workflow na dočasném Windows runneru nainstaluje ADK/WinPE,
 sestaví obraz a zveřejní `boot.wim`, `wimboot`, `BCD`, `boot.sdi` a `SHA256SUMS`
-pod tagem `osdcloud-v4`. Obraz obsahuje podepsané x64 ovladače VirtIO SCSI,
+pod tagem `osdcloud-v5`. Obraz obsahuje podepsané x64 ovladače VirtIO SCSI,
 VirtIO Block, NetKVM, VMware PVSCSI a VMXNET3. CAB balíčky z Microsoft Update
 Catalog mají připnuté SHA256 a build ověřuje podpisy Microsoft WHCP.
 Seznam verzí a zdrojů je v `scripts/winpe-virtual-drivers.json` a v release.
@@ -174,6 +174,10 @@ profilové cesty vyžadované PowerShellGet a obsahuje Microsoft.PowerShell.Arch
 **1.2.5** pro rozbalování ZIP balíčků ovladačů. Pro stejné virtuální
 ovladače při lokálním sestavení nejprve spusť `scripts/Get-WinPEVirtualDrivers.ps1 -DestinationPath .build/virtual-drivers` a sestavení předej `-DriverPath .build/virtual-drivers`.
 OSD obsahuje implementaci OSDCloud; nové sestavovací nástroje OSDeploy zde nejsou potřeba.
+Build také opravuje kolizi přepínače `$WebClient` s objektem stejného jména ve
+funkci `Save-WebFile` z OSD 26.10.6.1. Oprava ověřuje SHA256 původního i výsledného
+zdroje. Regresní test reprodukuje chybu a ověřuje skutečné HTTP stažení bez curl
+i s explicitním `-WebClient`, bez spuštění instalace Windows.
 Výstup je `artifacts/osdcloud/boot.wim`, `wimboot`, `BCD`, `boot.sdi` a `SHA256SUMS`.
 BCD a `boot.sdi` pocházejí ze stejného WinPE add-onu a iPXE je předává explicitně;
 samotný základní ADK WIM neobsahuje kompletní bootovací médium.
