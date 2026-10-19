@@ -1,4 +1,4 @@
-"""Boot WinPE on a disposable QEMU BIOS VM and require its safe startup prompt.
+"""Boot WinPE through iPXE and verify storage, networking and PowerShellGet.
 
 Run on the Linux CI runner with QEMU and Tesseract installed. Never types INSTALL
 or starts an OS deployment. All VM disks and logs are in .build/winpe-smoke.
@@ -16,8 +16,8 @@ import threading
 import time
 from pathlib import Path
 
-def run(assets, firmware='bios', memory=8192):
-    work = Path('.build/winpe-smoke' + ('-uefi' if firmware == 'uefi' else '')).resolve()
+def run(assets, firmware='bios', memory=8192, devices='sata'):
+    work = Path(f'.build/winpe-smoke-{firmware}-{devices}').resolve()
     work.mkdir(parents=True, exist_ok=False)
     for line in (assets / 'SHA256SUMS').read_text().splitlines():
         digest, name = line.split()
@@ -26,6 +26,7 @@ def run(assets, firmware='bios', memory=8192):
     server = ThreadingHTTPServer(('127.0.0.1', 0), partial(SimpleHTTPRequestHandler, directory=str(assets)))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     base = f'http://10.0.2.2:{server.server_port}'
+    (assets / 'network-probe.txt').write_text('WINPE-NETWORK-POWERSHELLGET-PASS')
     tftp = work / 'tftp'
     tftp.mkdir()
     script = (f'#!ipxe\ndhcp || goto failed\nkernel {base}/wimboot || goto failed\n' +
@@ -40,11 +41,22 @@ def run(assets, firmware='bios', memory=8192):
     command = [
         'qemu-system-x86_64', '-machine', 'q35',
         '-accel', 'kvm' if kvm else 'tcg,thread=multi', '-cpu', 'host' if kvm else 'max',
-        '-smp', '2', '-m', str(memory), '-drive', f'file={disk},format=qcow2,if=ide',
-        '-nic', f'user,model=e1000,tftp={tftp},bootfile=boot.ipxe',
+        '-smp', '2', '-m', str(memory),
         '-vga', 'std', '-display', 'none',
         '-qmp', f'unix:{sockpath},server=on,wait=off', '-no-reboot',
     ]
+    nic = 'e1000' if devices == 'sata' else 'vmxnet3' if devices == 'vmware' else 'virtio-net-pci'
+    command.extend(['-nic', f'user,model={nic},tftp={tftp},bootfile=boot.ipxe'])
+    if devices == 'sata':
+        command.extend(['-drive', f'file={disk},format=qcow2,if=ide'])
+    else:
+        command.extend(['-drive', f'file={disk},format=qcow2,if=none,id=testdisk'])
+        if devices == 'virtio-blk':
+            command.extend(['-device', 'virtio-blk-pci,drive=testdisk'])
+        else:
+            controller = 'pvscsi' if devices == 'vmware' else 'virtio-scsi-pci'
+            command.extend(['-device', f'{controller},id=scsi',
+                            '-device', 'scsi-hd,drive=testdisk,bus=scsi.0'])
     if firmware == 'uefi':
         code = Path('/usr/share/OVMF/OVMF_CODE_4M.fd')
         variables = work / 'OVMF_VARS.fd'
@@ -55,11 +67,11 @@ def run(assets, firmware='bios', memory=8192):
         command.extend(['-drive', f'if=pflash,format=raw,readonly=on,file={code}',
                         '-drive', f'if=pflash,format=raw,file={variables}',
                         '-drive', f'if=none,id=efi,file=fat:rw:{work / "efi-boot"},format=raw',
-                        '-device', 'virtio-blk-pci,drive=efi,bootindex=1'])
+                        '-device', 'qemu-xhci', '-device', 'usb-storage,drive=efi,bootindex=1'])
     else:
         command.extend(['-kernel', '/usr/lib/ipxe/ipxe.lkrn'])
-    (work / 'configuration.txt').write_text(f'Firmware: {firmware}\nRAM: {memory} MB\nKVM: {kvm}\n')
-    print(f'Boot test: {firmware}, {memory} MB RAM, KVM={kvm}', flush=True)
+    (work / 'configuration.txt').write_text(f'Firmware: {firmware}\nDevices: {devices}\nRAM: {memory} MB\nKVM: {kvm}\n')
+    print(f'Boot test: {firmware}, devices={devices}, {memory} MB RAM, KVM={kvm}', flush=True)
     with (work / 'qemu.log').open('wb') as log:
         process = subprocess.Popen(command, stdout=log, stderr=log)
         try:
@@ -89,6 +101,19 @@ def run(assets, firmware='bios', memory=8192):
 
                 qmp('qmp_capabilities')
                 previous = ''
+                probe_started = False
+
+                def type_command(text):
+                    # US keyboard in the stock en-US WinPE image; no INSTALL is sent.
+                    symbols = {' ': 'spc', '-': 'minus', '.': 'dot', '/': 'slash',
+                               ':': 'shift-semicolon', ';': 'semicolon', '"': 'shift-apostrophe',
+                               '|': 'shift-backslash'}
+                    for character in text:
+                        key = symbols.get(character, character)
+                        qmp('human-monitor-command', {'command-line': f'sendkey {key} 20'})
+                        time.sleep(0.045)
+                    qmp('human-monitor-command', {'command-line': 'sendkey ret'})
+
                 while time.monotonic() < deadline:
                     time.sleep(15)
                     if process.poll() is not None:
@@ -101,8 +126,18 @@ def run(assets, firmware='bios', memory=8192):
                     if normalized != previous:
                         print(text[-1400:], flush=True)
                         previous = normalized
-                    if 'type install' in normalized and 'osdcloud' in normalized:
-                        print('PASS: WinPE reached interactive OSDCloud confirmation. No deployment started.', flush=True)
+                    if not probe_started and 'type install' in normalized and 'osdcloud' in normalized:
+                        # Cancel our launcher, then perform read-only checks from cmd.
+                        # Getting this far proves Get-Disk saw the only attached test disk.
+                        qmp('human-monitor-command', {'command-line': 'sendkey ret'})
+                        time.sleep(2)
+                        type_command('powershell -nop -c "import-module powershellget -requiredversion 2.2.5 -ea stop; '
+                                     'import-packageprovider nuget -minimumversion 2.8.5.201 -ea stop | out-null; '
+                                     'find-module osd -requiredversion 26.10.6.1 -ea stop | out-null; '
+                                     f'irm {base}/network-probe.txt"')
+                        probe_started = True
+                    if probe_started and 'winpe-network-powershellget-pass' in normalized:
+                        print('PASS: Test disk visible, HTTP networking and PowerShellGet/NuGet/Find-Module work. No deployment started.', flush=True)
                         return
                     if '0xc000000f' in normalized or 'boot configuration data' in normalized:
                         raise RuntimeError('Windows Boot Manager rejected the boot configuration')
@@ -123,5 +158,6 @@ if __name__ == '__main__':
     parser.add_argument('assets', type=Path)
     parser.add_argument('--firmware', choices=('bios', 'uefi'), default='bios')
     parser.add_argument('--memory', type=int, default=8192)
+    parser.add_argument('--devices', choices=('sata', 'virtio-scsi', 'virtio-blk', 'vmware'), default='sata')
     args = parser.parse_args()
-    run(args.assets.resolve(), args.firmware, args.memory)
+    run(args.assets.resolve(), args.firmware, args.memory, args.devices)

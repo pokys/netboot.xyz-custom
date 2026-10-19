@@ -65,6 +65,23 @@ try {
     $modules = Join-Path $mount.FullName 'Program Files\WindowsPowerShell\Modules'
     New-Item -ItemType Directory -Path $modules -Force | Out-Null
     Save-Module -Name OSD -RequiredVersion '26.10.6.1' -Repository PSGallery -Path $modules -Force
+    # WinPE's optional PowerShell component alone cannot load PowerShellGet.
+    # Include its complete PS 5.1 dependencies and an offline NuGet provider.
+    Save-Module -Name PackageManagement -RequiredVersion '1.4.8.1' -Repository PSGallery -Path $modules -Force
+    Save-Module -Name PowerShellGet -RequiredVersion '2.2.5' -Repository PSGallery -Path $modules -Force
+    $provider = Get-PackageProvider -Name NuGet -ListAvailable |
+        Where-Object { $_.Version -ge [version]'2.8.5.201' } | Sort-Object Version -Descending | Select-Object -First 1
+    if (-not $provider -or -not (Test-Path -LiteralPath $provider.ProviderPath -PathType Leaf)) {
+        throw 'An installed NuGet provider is required on the build runner.'
+    }
+    $providerFolder = Join-Path $mount.FullName "Program Files\PackageManagement\ProviderAssemblies\nuget\$($provider.Version)"
+    New-Item -ItemType Directory -Path $providerFolder -Force | Out-Null
+    Copy-Item -LiteralPath $provider.ProviderPath -Destination $providerFolder
+    if ($DriverPath -and (Test-Path -LiteralPath (Join-Path $DriverPath 'winpe-virtual-drivers.json'))) {
+        Copy-Item -LiteralPath (Join-Path $DriverPath 'winpe-virtual-drivers.json') -Destination (Join-Path $OutputPath 'virtual-drivers.json')
+    }
+    # Preserve the injected provider/version evidence in the release artifacts.
+    Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Get-Drivers', '/Format:Table')
     $system32 = Join-Path $mount.FullName 'Windows\System32'
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\Start-Install.ps1') -Destination $system32
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\startnet.cmd') -Destination $system32

@@ -6,6 +6,12 @@ try {
         throw 'This launcher may only run inside Windows PE.'
     }
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+    Import-Module PackageManagement -RequiredVersion '1.4.8.1' -ErrorAction Stop
+    Import-Module PowerShellGet -RequiredVersion '2.2.5' -ErrorAction Stop
+    Import-PackageProvider -Name NuGet -MinimumVersion '2.8.5.201' -ErrorAction Stop | Out-Null
+    if (-not (Get-PSRepository -Name PSGallery -ErrorAction SilentlyContinue)) {
+        Register-PSRepository -Default -ErrorAction Stop
+    }
     Import-Module OSD -RequiredVersion '26.10.6.1' -ErrorAction Stop
     Get-Command Start-OSDCloudGUI -ErrorAction Stop | Out-Null
     $disks = @(Get-Disk | Where-Object { $_.BusType -notin @('USB', 'SD') })

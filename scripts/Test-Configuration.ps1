@@ -30,6 +30,8 @@ function Test-Launcher {
     $state = @{ GuiCalled = $false }
     function Test-Path { param($Path) return $InWinPE }
     function Import-Module { param($Name, $RequiredVersion, $ErrorAction) }
+    function Import-PackageProvider { param($Name, $MinimumVersion, $ErrorAction) }
+    function Get-PSRepository { param($Name, $ErrorAction) return @{Name='PSGallery'} }
     function Get-Command { param($Name, $ErrorAction) return $Name }
     function Get-Disk {
         if ($HasDisk) { [pscustomobject]@{Number=0; FriendlyName='TEST ONLY'; BusType='NVMe'; Size=64GB} }
