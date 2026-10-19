@@ -16,13 +16,26 @@ import threading
 import time
 from pathlib import Path
 
-def run(assets, firmware='bios', memory=8192, devices='sata'):
-    work = Path(f'.build/winpe-smoke-{firmware}-{devices}').resolve()
+def run(assets, firmware='bios', memory=8192, devices='sata', boot_source='netboot'):
+    work = Path(f'.build/winpe-smoke-{boot_source}-{firmware}-{devices}').resolve()
     work.mkdir(parents=True, exist_ok=False)
     for line in (assets / 'SHA256SUMS').read_text().splitlines():
         digest, name = line.split()
         with (assets / name).open('rb') as source:
             assert hashlib.file_digest(source, 'sha256').hexdigest() == digest
+    if boot_source == 'iso':
+        # Verify artifact parity by reading the actual WIM from the published ISO.
+        extractor = subprocess.Popen(['7z', 'x', '-so', str(assets / 'osdcloud.iso'), 'sources/boot.wim'],
+                                     stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        embedded_hash = hashlib.file_digest(extractor.stdout, 'sha256').hexdigest()
+        extractor.stdout.close()
+        extractor.wait(timeout=30)
+        stderr = extractor.stderr.read()
+        if extractor.returncode != 0:
+            raise RuntimeError(f'Cannot read ISO boot.wim: {stderr.decode(errors="replace")}')
+        with (assets / 'boot.wim').open('rb') as source:
+            if embedded_hash != hashlib.file_digest(source, 'sha256').hexdigest():
+                raise RuntimeError('ISO/netboot WIM mismatch')
     network_probe_received = threading.Event()
     osd_download_received = threading.Event()
 
@@ -73,17 +86,20 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
         code = Path('/usr/share/OVMF/OVMF_CODE_4M.fd')
         variables = work / 'OVMF_VARS.fd'
         shutil.copyfile('/usr/share/OVMF/OVMF_VARS_4M.fd', variables)
-        efi = work / 'efi-boot' / 'EFI' / 'BOOT'
-        efi.mkdir(parents=True)
-        shutil.copyfile('/usr/lib/ipxe/ipxe.efi', efi / 'BOOTX64.EFI')
         command.extend(['-drive', f'if=pflash,format=raw,readonly=on,file={code}',
-                        '-drive', f'if=pflash,format=raw,file={variables}',
-                        '-drive', f'if=none,id=efi,file=fat:rw:{work / "efi-boot"},format=raw',
-                        '-device', 'qemu-xhci', '-device', 'usb-storage,drive=efi,bootindex=1'])
-    else:
+                        '-drive', f'if=pflash,format=raw,file={variables}'])
+        if boot_source == 'netboot':
+            efi = work / 'efi-boot' / 'EFI' / 'BOOT'
+            efi.mkdir(parents=True)
+            shutil.copyfile('/usr/lib/ipxe/ipxe.efi', efi / 'BOOTX64.EFI')
+            command.extend(['-drive', f'if=none,id=efi,file=fat:rw:{work / "efi-boot"},format=raw',
+                            '-device', 'qemu-xhci', '-device', 'usb-storage,drive=efi,bootindex=1'])
+    elif boot_source == 'netboot':
         command.extend(['-kernel', '/usr/lib/ipxe/ipxe.lkrn'])
-    (work / 'configuration.txt').write_text(f'Firmware: {firmware}\nDevices: {devices}\nRAM: {memory} MB\nKVM: {kvm}\n')
-    print(f'Boot test: {firmware}, devices={devices}, {memory} MB RAM, KVM={kvm}', flush=True)
+    if boot_source == 'iso':
+        command.extend(['-cdrom', str(assets / 'osdcloud.iso'), '-boot', 'order=d'])
+    (work / 'configuration.txt').write_text(f'Boot: {boot_source}\nFirmware: {firmware}\nDevices: {devices}\nRAM: {memory} MB\nKVM: {kvm}\n')
+    print(f'Boot test: {boot_source}, {firmware}, devices={devices}, {memory} MB RAM, KVM={kvm}', flush=True)
     with (work / 'qemu.log').open('wb') as log:
         process = subprocess.Popen(command, stdout=log, stderr=log)
         try:
@@ -112,6 +128,12 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
                             return response['return']
 
                 qmp('qmp_capabilities')
+                if boot_source == 'iso':
+                    # Accommodate Microsoft's optional CD "press any key" prompt.
+                    # Space alone cannot accept the INSTALL deployment safeguard.
+                    for _ in range(20):
+                        qmp('human-monitor-command', {'command-line': 'sendkey spc'})
+                        time.sleep(1)
                 previous = ''
                 probe_started = False
 
@@ -181,6 +203,7 @@ if __name__ == '__main__':
     parser.add_argument('assets', type=Path)
     parser.add_argument('--firmware', choices=('bios', 'uefi'), default='bios')
     parser.add_argument('--memory', type=int, default=8192)
+    parser.add_argument('--boot', choices=('netboot', 'iso'), default='netboot')
     parser.add_argument('--devices', choices=('sata', 'virtio-scsi', 'virtio-blk', 'vmware'), default='sata')
     args = parser.parse_args()
-    run(args.assets.resolve(), args.firmware, args.memory, args.devices)
+    run(args.assets.resolve(), args.firmware, args.memory, args.devices, args.boot)

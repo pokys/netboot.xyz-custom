@@ -14,11 +14,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {firmware: bios, devices: sata}
-          - {firmware: uefi, devices: sata}
-          - {firmware: uefi, devices: virtio-scsi}
-          - {firmware: uefi, devices: virtio-blk}
-          - {firmware: uefi, devices: vmware}
+          - {boot: netboot, firmware: bios, devices: sata}
+          - {boot: netboot, firmware: uefi, devices: sata}
+          - {boot: netboot, firmware: uefi, devices: virtio-scsi}
+          - {boot: netboot, firmware: uefi, devices: virtio-blk}
+          - {boot: netboot, firmware: uefi, devices: vmware}
+          - {boot: iso, firmware: bios, devices: sata}
+          - {boot: iso, firmware: uefi, devices: sata}
+          - {boot: iso, firmware: uefi, devices: virtio-scsi}
+          - {boot: iso, firmware: uefi, devices: vmware}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -26,19 +30,19 @@ jobs:
       - name: Prepare disposable VM test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf ipxe tesseract-ocr
+          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf ipxe tesseract-ocr p7zip-full
           if [ -e /dev/kvm ]; then sudo chmod a+rw /dev/kvm; fi
       - name: Download published boot files
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release download osdcloud-v5 --repo "$GITHUB_REPOSITORY" --dir artifacts/osdcloud
+        run: gh release download osdcloud-v6 --repo "$GITHUB_REPOSITORY" --dir artifacts/osdcloud
       - name: Boot the published image without starting a deployment
-        run: python -u -m tools.test_winpe_boot artifacts/osdcloud --firmware "${{ matrix.firmware }}" --memory 8192 --devices "${{ matrix.devices }}"
+        run: python -u -m tools.test_winpe_boot artifacts/osdcloud --boot "${{ matrix.boot }}" --firmware "${{ matrix.firmware }}" --memory 8192 --devices "${{ matrix.devices }}"
       - name: Save boot test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: winpe-${{ matrix.firmware }}-${{ matrix.devices }}-diagnostics
+          name: winpe-${{ matrix.boot }}-${{ matrix.firmware }}-${{ matrix.devices }}-diagnostics
           include-hidden-files: true
           path: |
             .build/winpe-smoke*/*.png

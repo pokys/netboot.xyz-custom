@@ -7,7 +7,7 @@ permissions:
   contents: write
 
 env:
-  OSDCLOUD_RELEASE_TAG: osdcloud-v5
+  OSDCLOUD_RELEASE_TAG: osdcloud-v6
 
 concurrency:
   group: osdcloud-boot-files
@@ -33,12 +33,18 @@ jobs:
           Install-PackageProvider -Name NuGet -MinimumVersion 2.8.5.201 -Scope CurrentUser -Force | Out-Null
           ./scripts/Get-WinPEVirtualDrivers.ps1 -DestinationPath .build/virtual-drivers
           ./scripts/Build-OSDCloud.ps1 -DriverPath .build/virtual-drivers
+          ./scripts/Build-OSDCloudIso.ps1
+          Copy-Item artifacts/osdcloud-iso/osdcloud.iso artifacts/osdcloud/osdcloud.iso
+          Copy-Item artifacts/osdcloud-iso/SOURCE-WIM-SHA256.txt artifacts/osdcloud/SOURCE-WIM-SHA256.txt
+          Get-ChildItem artifacts/osdcloud -File | Where-Object Name -ne 'SHA256SUMS' |
+            Get-FileHash -Algorithm SHA256 | ForEach-Object { '{0}  {1}' -f $_.Hash.ToLowerInvariant(), [IO.Path]::GetFileName($_.Path) } |
+            Set-Content artifacts/osdcloud/SHA256SUMS -Encoding Ascii
       - name: Verify and publish boot files
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           $ErrorActionPreference = 'Stop'
-          $files = @('artifacts/osdcloud/boot.wim', 'artifacts/osdcloud/wimboot', 'artifacts/osdcloud/BCD', 'artifacts/osdcloud/boot.sdi', 'artifacts/osdcloud/SHA256SUMS', 'artifacts/osdcloud/virtual-drivers.json')
+          $files = @('artifacts/osdcloud/boot.wim', 'artifacts/osdcloud/wimboot', 'artifacts/osdcloud/BCD', 'artifacts/osdcloud/boot.sdi', 'artifacts/osdcloud/SHA256SUMS', 'artifacts/osdcloud/virtual-drivers.json', 'artifacts/osdcloud/runtime-manifest.json', 'artifacts/osdcloud/osdcloud.iso', 'artifacts/osdcloud/SOURCE-WIM-SHA256.txt')
           foreach ($file in $files) {
             if (-not (Test-Path -LiteralPath $file -PathType Leaf)) { throw "Missing boot file: $file" }
           }
@@ -50,13 +56,15 @@ jobs:
 
           Built on a disposable GitHub-hosted Windows runner from Microsoft ADK/WinPE 10.1.26100.9457, OSD 26.10.6.1 and checksum-pinned wimboot 2.9.0. See SHA256SUMS and the repository build workflow for provenance. The launcher requires interactive confirmation and does not select a target disk automatically.
 
-          Includes matching BCD/boot.sdi, signed x64 VirtIO SCSI/Block/NetKVM and VMware PVSCSI/VMXNET3 drivers from checksum-pinned Microsoft Update CABs (see virtual-drivers.json), plus PowerShellGet 2.2.5, PackageManagement 1.4.8.1 the NuGet provider and Microsoft.PowerShell.Archive 1.2.5. Startup initializes the WinPE profile/data paths required by PowerShellGet. OSD 26.10.6.1 includes a checksum-guarded local repair of the Save-WebFile WebClient variable collision; a real HTTP download regression runs before image publication. Subsequent BIOS/UEFI device tests verify disk detection, networking and read-only Find-Module without starting a deployment. Check their results before using this release.
+          One build produces boot.wim for iPXE and osdcloud.iso containing that exact WIM (see SOURCE-WIM-SHA256.txt). Includes signed VirtIO/VMware drivers, pinned x64 curl 8.23.0_1 with its CA bundle, 7-Zip 26.04, required PowerShell/WinPE components and the checksum-guarded OSD WebClient repair. The launcher validates runtime commands, archives, DISM metadata and actual downloads before deployment. See runtime-manifest.json for versions and sources.
+
+          Boot and deployment validations run after publication. Consult their actual results; publication alone does not confirm a completed deployment. Starting an installation can erase internal disks.
           '@
           $notes | Set-Content -LiteralPath artifacts/osdcloud/release-notes.txt -Encoding UTF8
           $releases = gh release list --repo "$env:GITHUB_REPOSITORY" --limit 100 --json tagName | ConvertFrom-Json
           if ($LASTEXITCODE -ne 0) { throw 'Could not check existing releases' }
           if ($env:OSDCLOUD_RELEASE_TAG -in @($releases.tagName)) { throw 'Release already exists; refusing to replace published boot files.' }
-          gh release create "$env:OSDCLOUD_RELEASE_TAG" @files --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title 'Windows 10/11 OSDCloud boot files v5' --notes-file artifacts/osdcloud/release-notes.txt --latest=false
+          gh release create "$env:OSDCLOUD_RELEASE_TAG" @files --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title 'Windows 10/11 OSDCloud PE v6 (netboot and ISO)' --notes-file artifacts/osdcloud/release-notes.txt --latest=false
           if ($LASTEXITCODE -ne 0) { throw 'Boot file publication failed' }
 
   boot-smoke:
@@ -67,11 +75,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - {firmware: bios, devices: sata}
-          - {firmware: uefi, devices: sata}
-          - {firmware: uefi, devices: virtio-scsi}
-          - {firmware: uefi, devices: virtio-blk}
-          - {firmware: uefi, devices: vmware}
+          - {boot: netboot, firmware: bios, devices: sata}
+          - {boot: netboot, firmware: uefi, devices: sata}
+          - {boot: netboot, firmware: uefi, devices: virtio-scsi}
+          - {boot: netboot, firmware: uefi, devices: virtio-blk}
+          - {boot: netboot, firmware: uefi, devices: vmware}
+          - {boot: iso, firmware: bios, devices: sata}
+          - {boot: iso, firmware: uefi, devices: sata}
+          - {boot: iso, firmware: uefi, devices: virtio-scsi}
+          - {boot: iso, firmware: uefi, devices: vmware}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:
@@ -79,19 +91,19 @@ jobs:
       - name: Install disposable VM test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf ipxe tesseract-ocr
+          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf ipxe tesseract-ocr p7zip-full
           if [ -e /dev/kvm ]; then sudo chmod a+rw /dev/kvm; fi
       - name: Download the boot files
         env:
           GH_TOKEN: ${{ github.token }}
         run: gh release download "$OSDCLOUD_RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir artifacts/osdcloud
       - name: Boot WinPE without starting a deployment
-        run: python -u -m tools.test_winpe_boot artifacts/osdcloud --firmware "${{ matrix.firmware }}" --devices "${{ matrix.devices }}"
+        run: python -u -m tools.test_winpe_boot artifacts/osdcloud --boot "${{ matrix.boot }}" --firmware "${{ matrix.firmware }}" --devices "${{ matrix.devices }}"
       - name: Save boot test evidence
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
-          name: winpe-${{ matrix.firmware }}-${{ matrix.devices }}-evidence
+          name: winpe-${{ matrix.boot }}-${{ matrix.firmware }}-${{ matrix.devices }}-evidence
           include-hidden-files: true
           path: |
             .build/winpe-smoke*/*.png

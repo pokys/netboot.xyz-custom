@@ -13,6 +13,9 @@ try {
         Register-PSRepository -Default -ErrorAction Stop
     }
     Import-Module OSD -RequiredVersion '26.10.6.1' -ErrorAction Stop
+    Import-Module "$env:SystemRoot\System32\OSDCloud.Runtime.psm1" -Force -ErrorAction Stop
+    Write-Host 'Checking OSDCloud requirements before deployment...' -ForegroundColor Cyan
+    Test-OSDCloudRequirements | Out-Null
     Get-Command Start-OSDCloudGUI -ErrorAction Stop | Out-Null
     $disks = @(Get-Disk | Where-Object { $_.BusType -notin @('USB', 'SD') })
     if ($disks.Count -eq 0) { throw 'No installation disk found. Load the storage driver and try again.' }

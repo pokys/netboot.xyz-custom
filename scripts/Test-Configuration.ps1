@@ -2,7 +2,7 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $errorsFound = @()
-Get-ChildItem -LiteralPath $root -Recurse -Filter '*.ps1' |
+Get-ChildItem -LiteralPath $root -Recurse -Include '*.ps1','*.psm1' |
     Where-Object { $_.FullName -notmatch '[\\/](\.git|\.build|artifacts)[\\/]' } |
     ForEach-Object {
         $parseErrors = $null
@@ -29,7 +29,8 @@ function Test-Launcher {
     param([bool]$InWinPE, [string]$Answer, [bool]$HasDisk, [bool]$ExpectGUI, [int]$ExpectedExit)
     $state = @{ GuiCalled = $false }
     function Test-Path { param($Path) return $InWinPE }
-    function Import-Module { param($Name, $RequiredVersion, $ErrorAction) }
+    function Import-Module { param($Name, $RequiredVersion, $ErrorAction, [switch]$Force) }
+    function Test-OSDCloudRequirements { return @{Passed=$true} }
     function Import-PackageProvider { param($Name, $MinimumVersion, $ErrorAction) }
     function Get-PSRepository { param($Name, $ErrorAction) return @{Name='PSGallery'} }
     function Get-Command { param($Name, $ErrorAction) return $Name }

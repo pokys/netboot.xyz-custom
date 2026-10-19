@@ -18,7 +18,7 @@ $sourceWim = Join-Path $peRoot 'en-us\winpe.wim'
 $ocRoot = Join-Path $peRoot 'WinPE_OCs'
 $dism = Join-Path $AdkRoot 'Deployment Tools\amd64\DISM\dism.exe'
 # Dependency order is required by Microsoft WinPE optional components.
-$packages = @('WinPE-WMI', 'WinPE-NetFX', 'WinPE-Scripting', 'WinPE-PowerShell', 'WinPE-StorageWMI', 'WinPE-DismCmdlets', 'WinPE-HTA', 'WinPE-SecureStartup')
+$packages = @('WinPE-WMI', 'WinPE-NetFX', 'WinPE-Scripting', 'WinPE-PowerShell', 'WinPE-StorageWMI', 'WinPE-DismCmdlets', 'WinPE-HTA', 'WinPE-SecureStartup', 'WinPE-EnhancedStorage', 'WinPE-Dot3Svc', 'WinPE-RNDIS', 'WinPE-SecureBootCmdlets', 'WinPE-PlatformId')
 $bootFiles = @{ 'BCD' = (Join-Path $peRoot 'Media\Boot\BCD'); 'boot.sdi' = (Join-Path $peRoot 'Media\Boot\boot.sdi') }
 foreach ($required in @($sourceWim, $dism) + @($bootFiles.Values) + @($packages | ForEach-Object { Join-Path $ocRoot "$_.cab" })) {
     if (-not (Test-Path -LiteralPath $required -PathType Leaf)) {
@@ -90,6 +90,29 @@ try {
     $system32 = Join-Path $mount.FullName 'Windows\System32'
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\Start-Install.ps1') -Destination $system32
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\startnet.cmd') -Destination $system32
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\OSDCloud.Runtime.psm1') -Destination $system32
+    $fixture = New-Item -ItemType Directory -Path (Join-Path $WorkPath 'runtime-fixture')
+    'OSDCLOUD-WIM-PASS' | Set-Content -LiteralPath (Join-Path $fixture.FullName 'probe.txt') -Encoding Ascii
+    Invoke-AdkDism -DismArguments @('/Capture-Image', "/ImageFile:$system32\OSDCloud-test.wim", "/CaptureDir:$($fixture.FullName)", '/Name:OSDCloudRuntime', '/Compress:fast', '/CheckIntegrity')
+    & (Join-Path $PSScriptRoot 'Add-OSDCloudUtilities.ps1') -MountPath $mount.FullName -WorkPath (Join-Path $WorkPath 'utilities')
+    $revision = if ($env:GITHUB_SHA -match '^[0-9a-f]{40}$') { $env:GITHUB_SHA } else { 'master' }
+    $runtime = [ordered]@{
+        SchemaVersion = 1
+        SourceRevision = $revision
+        Architecture = 'amd64'
+        ADK = '10.1.26100.9457'
+        OSD = '26.10.6.1'
+        PowerShellGet = '2.2.5'
+        PackageManagement = '1.4.8.1'
+        Archive = '1.2.5'
+        NuGet = $provider.Version.ToString()
+        ProbeUrl = "https://raw.githubusercontent.com/pokys/netboot.xyz-custom/$revision/winpe/runtime-probe.txt"
+        OptionalComponents = $packages
+        Utilities = @(Get-Content -LiteralPath (Join-Path $mount.FullName 'ProgramData\OSDCloud\utilities.json') -Raw | ConvertFrom-Json)
+        OSDDownloaderSHA256 = (Get-FileHash -LiteralPath (Join-Path $modules 'OSD\26.10.6.1\Public\Functions\Save-WebFile.ps1') -Algorithm SHA256).Hash.ToLowerInvariant()
+    }
+    $runtime | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath (Join-Path $system32 'osdcloud-runtime.json') -Encoding UTF8
+    Copy-Item -LiteralPath (Join-Path $system32 'osdcloud-runtime.json') -Destination (Join-Path $OutputPath 'runtime-manifest.json')
     Invoke-AdkDism -DismArguments @('/Unmount-Image', "/MountDir:$($mount.FullName)", '/Commit')
     $mounted = $false
 
