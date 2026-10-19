@@ -2,13 +2,15 @@
 # Override this setting in boot.cfg to use your own HTTP(S) asset server.
 # Migrate the previous built-in default when returning without rebooting iPXE.
 iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud && clear osdcloud_base_url ||
-isset ${osdcloud_base_url} || set osdcloud_base_url https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v2
+iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v2 && clear osdcloud_base_url ||
+iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v3 && clear osdcloud_base_url ||
+isset ${osdcloud_base_url} || set osdcloud_base_url https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v4
 
 :windows
 menu Windows 10 / 11 - OSDCloud installer
 item --gap Choose Windows 10 22H2 or a Windows 11 release in the WinPE wizard.
 item --gap Downloads Windows from Microsoft after WinPE starts.
-item --gap Installation erases the selected disk. Review it in WinPE.
+item --gap Installation can erase internal disks. Review every confirmation.
 item start Start Windows 10 / 11 installer (64-bit PC - BIOS or x64 UEFI)
 item url Change boot asset URL [${osdcloud_base_url}]
 item back Return to custom menu
