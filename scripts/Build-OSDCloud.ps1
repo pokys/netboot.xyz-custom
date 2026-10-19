@@ -81,6 +81,7 @@ try {
     & python -m tools.test_osd_web_download (Join-Path $modules 'OSD\26.10.6.1') --work-path (Join-Path $WorkPath 'download-regression')
     if ($LASTEXITCODE -ne 0) { throw 'OSD WebClient download regression test failed.' }
     & (Join-Path $PSScriptRoot '..\winpe\Repair-OSDWebDownload.ps1') -ModuleRoot (Join-Path $modules 'OSD\26.10.6.1')
+    & (Join-Path $PSScriptRoot '..\winpe\Repair-OSDUsbAccessPaths.ps1') -ModuleRoot (Join-Path $modules 'OSD\26.10.6.1')
     # WinPE's optional PowerShell component alone cannot load PowerShellGet.
     # Include its complete PS 5.1 dependencies and an offline NuGet provider.
     Save-Module -Name PackageManagement -RequiredVersion '1.4.8.1' -Repository PSGallery -Path $modules -Force
@@ -129,6 +130,7 @@ try {
         OptionalComponents = $packages
         Utilities = @((Get-Content -LiteralPath (Join-Path $mount.FullName 'ProgramData\OSDCloud\utilities.json') -Raw | ConvertFrom-Json) | ForEach-Object { $_ })
         OSDDownloaderSHA256 = (Get-FileHash -LiteralPath (Join-Path $modules 'OSD\26.10.6.1\Public\Functions\Save-WebFile.ps1') -Algorithm SHA256).Hash.ToLowerInvariant()
+        OSDUsbAccessPathsSHA256 = (Get-FileHash -LiteralPath (Join-Path $modules 'OSD\26.10.6.1\Private\Invoke-OSDCloudGUI.ps1') -Algorithm SHA256).Hash.ToLowerInvariant()
     }
     $runtime | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath (Join-Path $system32 'osdcloud-runtime.json') -Encoding UTF8
     Copy-Item -LiteralPath (Join-Path $system32 'osdcloud-runtime.json') -Destination (Join-Path $OutputPath 'runtime-manifest.json')

@@ -41,6 +41,10 @@ try {
     $guardPassed = $true
     Start-Transcript -LiteralPath 'X:\ci-deployment.txt' -Force | Out-Null
     Import-Module OSD -RequiredVersion '26.10.6.1' -Force
+    Send-Report 'storage' @{
+        Disks=@(Get-Disk | Select-Object Number,BusType,PartitionStyle,SerialNumber,Size)
+        Partitions=@(Get-Partition -ErrorAction SilentlyContinue | Select-Object DiskNumber,PartitionNumber,DriveLetter,AccessPaths)
+    }
     $settings = @{
         OSName = $(if ($OS -eq 'windows11') {'Windows 11 25H2 x64'} else {'Windows 10 22H2 x64'})
         OSVersion = $(if ($OS -eq 'windows11') {'Windows 11'} else {'Windows 10'})
@@ -109,7 +113,12 @@ try {
     Write-Host 'OSDCLOUD FULL DEPLOYMENT PASS' -ForegroundColor Green
 }
 catch {
-    Send-Report 'failure' @{Completed=$false; GuardPassed=$guardPassed; Error=$_.Exception.Message; Stack=$_.ScriptStackTrace}
+    Send-Report 'failure' @{Completed=$false; GuardPassed=$guardPassed; Error=$_.Exception.Message; Stack=$_.ScriptStackTrace;
+        USBPartitions=@($Global:OSDCloud.USBPartitions | Select-Object DiskNumber,PartitionNumber,DriveLetter,AccessPaths);
+        RecentErrors=@($Error | Select-Object -First 6 | ForEach-Object {
+            @{Message=$_.Exception.Message; Type=$_.Exception.GetType().FullName; Stack=$_.ScriptStackTrace;
+                Position=$_.InvocationInfo.PositionMessage; Target=[string]$_.TargetObject}
+        })}
     Write-Host $_.Exception.Message -ForegroundColor Red
     throw
 }
