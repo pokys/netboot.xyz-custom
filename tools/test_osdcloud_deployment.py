@@ -4,10 +4,7 @@ This is deliberately separate from the non-destructive boot smoke test. Both the
 host and guest validate dedicated test-only conditions before any disk clear.
 Never runs on the user's machine; requires a GitHub-hosted runner and KVM.
 """
-import csv
-import io
 import re
-import struct
 import argparse
 from functools import partial
 import hashlib
@@ -21,6 +18,45 @@ import tempfile
 import threading
 import time
 from pathlib import Path
+from PIL import Image
+
+
+def find_start_button(screenshot):
+    """Locate the single filled blue OSDCloud button, avoiding unreliable text OCR."""
+    with Image.open(screenshot) as source:
+        picture = source.convert('RGB')
+    width, height = picture.size
+    pixels = picture.load()
+    # The desktop blue is less saturated than the button. Restrict the search
+    # to the lower right, and require a filled rectangle rather than blue text.
+    colored = set()
+    for y in range(height * 2 // 5, height):
+        for x in range(width * 2 // 5, width):
+            red, green, blue = pixels[x, y]
+            if red < 50 and 70 <= green <= 150 and blue >= 160 and blue - green > 65:
+                colored.add(y * width + x)
+    buttons = []
+    while colored:
+        seed = colored.pop()
+        pending = [seed]
+        left = right = seed % width
+        top = bottom = seed // width
+        area = 0
+        while pending:
+            point = pending.pop()
+            x, y = point % width, point // width
+            left, right = min(left, x), max(right, x)
+            top, bottom = min(top, y), max(bottom, y)
+            area += 1
+            for adjacent in (point - 1, point + 1, point - width, point + width):
+                if adjacent in colored:
+                    colored.remove(adjacent)
+                    pending.append(adjacent)
+        box_width, box_height = right - left + 1, bottom - top + 1
+        if (60 <= box_width <= 600 and 20 <= box_height <= 160 and
+                2 <= box_width / box_height <= 6 and area / (box_width * box_height) > 0.7):
+            buttons.append(((left + right) // 2, (top + bottom) // 2, width, height))
+    return buttons[0] if len(buttons) == 1 else None
 
 def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source='netboot', os_version='windows11'):
     if os.environ.get('GITHUB_ACTIONS') != 'true' or os.environ.get('RUNNER_ENVIRONMENT') != 'github-hosted':
@@ -207,16 +243,9 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                                      f'& x:/ci-deploy.ps1 -server {base} -os {os_version} -devices {devices}"')
                         launched = True
                     if launched and not clicked and reports.get('ready.json', {}).get('GuardPassed') and 'deployment options' in normalized:
-                        # Sparse mode also finds the white Start label on its blue button.
-                        # Automatic page segmentation can omit colored GUI labels entirely.
-                        tsv = subprocess.check_output(['tesseract', str(screenshot), 'stdout', '--psm', '11', 'tsv'], stderr=subprocess.DEVNULL, text=True)
-                        width, height = struct.unpack('>II', screenshot.read_bytes()[16:24])
-                        buttons = [row for row in csv.DictReader(io.StringIO(tsv), delimiter='\t')
-                                   if row['text'].strip().lower() == 'start' and int(row['left']) > width * 0.4 and int(row['top']) > height * 0.4]
-                        if buttons:
-                            button = max(buttons, key=lambda row: int(row['top']))
-                            x = int(button['left']) + int(button['width']) // 2
-                            y = int(button['top']) + int(button['height']) // 2
+                        button = find_start_button(screenshot)
+                        if button:
+                            x, y, width, height = button
                             qmp('input-send-event', {'events': [
                                 {'type': 'abs', 'data': {'axis': 'x', 'value': x * 32767 // width}},
                                 {'type': 'abs', 'data': {'axis': 'y', 'value': y * 32767 // height}}]})

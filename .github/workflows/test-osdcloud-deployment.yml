@@ -49,6 +49,7 @@ jobs:
           sudo docker image prune --all --force
           sudo apt-get update
           sudo apt-get install -y qemu-system-x86 qemu-utils ovmf ipxe tesseract-ocr p7zip-full
+          python -m pip install --disable-pip-version-check pillow==12.3.0
           test -e /dev/kvm
           sudo chmod a+rw /dev/kvm
           df -h .
