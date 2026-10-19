@@ -31,9 +31,9 @@ cpuid --ext 29 || goto unsupported
 imgfree
 echo Boot platform: ${platform} - iPXE build: ${buildarch}
 kernel ${osdcloud_base_url}/wimboot || goto failed
-initrd ${osdcloud_base_url}/BCD BCD || goto failed
-initrd ${osdcloud_base_url}/boot.sdi boot.sdi || goto failed
-initrd ${osdcloud_base_url}/boot.wim boot.wim || goto failed
+initrd --name BCD ${osdcloud_base_url}/BCD BCD || goto failed
+initrd --name boot.sdi ${osdcloud_base_url}/boot.sdi boot.sdi || goto failed
+initrd --name boot.wim ${osdcloud_base_url}/boot.wim boot.wim || goto failed
 boot || goto failed
 
 :unsupported

@@ -67,7 +67,7 @@ jobs:
         with:
           persist-credentials: false
       - name: Install disposable VM test dependencies
-        run: sudo apt-get update && sudo apt-get install -y qemu-system-x86 qemu-utils tesseract-ocr
+        run: sudo apt-get update && sudo apt-get install -y qemu-system-x86 qemu-utils ipxe tesseract-ocr
       - name: Download the boot files
         env:
           GH_TOKEN: ${{ github.token }}
@@ -79,6 +79,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: winpe-bios-boot-evidence
+          include-hidden-files: true
           path: |
             .build/winpe-smoke/*.png
             .build/winpe-smoke/*.txt

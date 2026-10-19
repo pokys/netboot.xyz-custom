@@ -4,17 +4,17 @@ Run on the Linux CI runner with QEMU and Tesseract installed. Never types INSTAL
 or starts an OS deployment. All VM disks and logs are in .build/winpe-smoke.
 """
 import argparse
+from functools import partial
 import hashlib
+from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 import json
 import os
 import shutil
 import socket
 import subprocess
+import threading
 import time
 from pathlib import Path
-
-from tools.prepare_small_live import append_cpio
-
 
 def run(assets, firmware='bios', memory=8192):
     work = Path('.build/winpe-smoke' + ('-uefi' if firmware == 'uefi' else '')).resolve()
@@ -23,9 +23,16 @@ def run(assets, firmware='bios', memory=8192):
         digest, name = line.split()
         with (assets / name).open('rb') as source:
             assert hashlib.file_digest(source, 'sha256').hexdigest() == digest
-    initrd = work / 'boot.cpio'
-    with initrd.open('wb') as stream:
-        append_cpio(stream, [assets / name for name in ('BCD', 'boot.sdi', 'boot.wim')])
+    server = ThreadingHTTPServer(('127.0.0.1', 0), partial(SimpleHTTPRequestHandler, directory=str(assets)))
+    threading.Thread(target=server.serve_forever, daemon=True).start()
+    base = f'http://10.0.2.2:{server.server_port}'
+    tftp = work / 'tftp'
+    tftp.mkdir()
+    script = (f'#!ipxe\ndhcp || goto failed\nkernel {base}/wimboot || goto failed\n' +
+              ''.join(f'initrd --name {name} {base}/{name} {name} || goto failed\n'
+                      for name in ('BCD', 'boot.sdi', 'boot.wim')) +
+              'boot || goto failed\n:failed\necho WinPE boot test failed in iPXE\nshell\n')
+    (tftp / 'boot.ipxe').write_text(script)
     disk = work / 'blank-test-disk.qcow2'
     subprocess.run(['qemu-img', 'create', '-f', 'qcow2', str(disk), '32G'], check=True)
     sockpath = work / 'qmp.sock'
@@ -33,17 +40,24 @@ def run(assets, firmware='bios', memory=8192):
     command = [
         'qemu-system-x86_64', '-machine', 'q35',
         '-accel', 'kvm' if kvm else 'tcg,thread=multi', '-cpu', 'host' if kvm else 'max',
-        '-smp', '2', '-m', str(memory), '-kernel', str(assets / 'wimboot'),
-        '-initrd', str(initrd), '-drive', f'file={disk},format=qcow2,if=ide',
-        '-nic', 'user,model=e1000', '-vga', 'std', '-display', 'none',
+        '-smp', '2', '-m', str(memory), '-drive', f'file={disk},format=qcow2,if=ide',
+        '-nic', f'user,model=e1000,tftp={tftp},bootfile=boot.ipxe',
+        '-vga', 'std', '-display', 'none',
         '-qmp', f'unix:{sockpath},server=on,wait=off', '-no-reboot',
     ]
     if firmware == 'uefi':
         code = Path('/usr/share/OVMF/OVMF_CODE_4M.fd')
         variables = work / 'OVMF_VARS.fd'
         shutil.copyfile('/usr/share/OVMF/OVMF_VARS_4M.fd', variables)
+        efi = work / 'efi-boot' / 'EFI' / 'BOOT'
+        efi.mkdir(parents=True)
+        shutil.copyfile('/usr/lib/ipxe/ipxe.efi', efi / 'BOOTX64.EFI')
         command.extend(['-drive', f'if=pflash,format=raw,readonly=on,file={code}',
-                        '-drive', f'if=pflash,format=raw,file={variables}'])
+                        '-drive', f'if=pflash,format=raw,file={variables}',
+                        '-drive', f'if=none,id=efi,file=fat:rw:{work / "efi-boot"},format=raw',
+                        '-device', 'virtio-blk-pci,drive=efi,bootindex=1'])
+    else:
+        command.extend(['-kernel', '/usr/lib/ipxe/ipxe.lkrn'])
     (work / 'configuration.txt').write_text(f'Firmware: {firmware}\nRAM: {memory} MB\nKVM: {kvm}\n')
     print(f'Boot test: {firmware}, {memory} MB RAM, KVM={kvm}', flush=True)
     with (work / 'qemu.log').open('wb') as log:
@@ -94,6 +108,8 @@ def run(assets, firmware='bios', memory=8192):
                         raise RuntimeError('Windows Boot Manager rejected the boot configuration')
             raise TimeoutError('WinPE did not reach its confirmation prompt; see screenshot')
         finally:
+            server.shutdown()
+            server.server_close()
             process.terminate()
             try:
                 process.wait(timeout=10)

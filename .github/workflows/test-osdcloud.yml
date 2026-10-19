@@ -21,7 +21,7 @@ jobs:
       - name: Prepare disposable VM test dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf tesseract-ocr
+          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf ipxe tesseract-ocr
           if [ -e /dev/kvm ]; then sudo chmod a+rw /dev/kvm; fi
       - name: Download published boot files
         env:
@@ -34,6 +34,7 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: winpe-${{ matrix.firmware }}-diagnostics
+          include-hidden-files: true
           path: |
             .build/winpe-smoke*/*.png
             .build/winpe-smoke*/*.txt
