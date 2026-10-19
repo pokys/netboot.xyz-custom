@@ -35,7 +35,7 @@ jobs:
       - name: Download published boot files
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release download osdcloud-v6 --repo "$GITHUB_REPOSITORY" --dir artifacts/osdcloud
+        run: gh release download osdcloud-v7 --repo "$GITHUB_REPOSITORY" --dir artifacts/osdcloud
       - name: Boot the published image without starting a deployment
         run: python -u -m tools.test_winpe_boot artifacts/osdcloud --boot "${{ matrix.boot }}" --firmware "${{ matrix.firmware }}" --memory 8192 --devices "${{ matrix.devices }}"
       - name: Save boot test evidence

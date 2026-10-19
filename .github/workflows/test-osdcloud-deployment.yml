@@ -5,7 +5,7 @@ on:
       release_tag:
         description: Published PE release to validate
         required: true
-        default: osdcloud-v6
+        default: osdcloud-v7
         type: string
   workflow_call:
     inputs:

@@ -147,11 +147,16 @@ python tools/discover_dell_esxi.py
 Bez instalace nástrojů na vlastní PC spusť v GitHubu **Actions → Build Windows installer
 boot files → Run workflow**. Workflow na dočasném Windows runneru nainstaluje ADK/WinPE,
 sestaví obraz a zveřejní `boot.wim`, `osdcloud.iso`, `wimboot`, `BCD`, `boot.sdi` a `SHA256SUMS`
-pod tagem `osdcloud-v6`. ISO obsahuje totožný `sources/boot.wim` jako netboot;
+pod tagem nastaveným v `OSDCLOUD_RELEASE_TAG` ve workflow. ISO obsahuje totožný `sources/boot.wim` jako netboot;
 jeho hash je také v `SOURCE-WIM-SHA256.txt`. Obraz obsahuje podepsané x64 ovladače VirtIO SCSI,
 VirtIO Block, NetKVM, VMware PVSCSI a VMXNET3. CAB balíčky z Microsoft Update
 Catalog mají připnuté SHA256 a build ověřuje podpisy Microsoft WHCP.
 Seznam verzí a zdrojů je v `scripts/winpe-virtual-drivers.json` a v release.
+Build přibalí stejné podepsané balíčky i pro cílové Windows. Závěrečný hook OSDCloud
+je přidá do offline instalace při detekci VirtIO nebo VMware PCI zařízení;
+u VMware vybere variantu INF podle buildu cílového jádra, protože balíčky pro novější
+Windows nejsou použitelné pro všechny starší verze. Tím se řeší i ovladač systémového
+disku po prvním restartu, nejen jeho viditelnost v PE.
 Boot testy zavádějí WinPE přes iPXE i přímo z ISO v BIOS/UEFI a s virtuálními řadiči,
 ověřují detekci disku, HTTP síť a PowerShellGet/NuGet pomocí `Find-Module`;
 instalaci Windows nespouští. Samostatný workflow **Validate complete OSDCloud deployments**
@@ -219,10 +224,10 @@ Pro opakovaný build zvol nové adresáře:
 Výchozí menu očekává tyto adresy:
 
 ```text
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v6/boot.wim
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v6/wimboot
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v6/BCD
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v6/boot.sdi
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/boot.wim
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/wimboot
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/BCD
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/boot.sdi
 ```
 
 Po ručním buildu vytvoř GitHub Release s novým tagem a přilož všechny čtyři soubory
