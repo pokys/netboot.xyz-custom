@@ -29,5 +29,6 @@ try {
 }
 catch {
     Write-Host $_.Exception.Message -ForegroundColor Red
+    Write-Host $_.ScriptStackTrace -ForegroundColor DarkGray
     exit 1
 }

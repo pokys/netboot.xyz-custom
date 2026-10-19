@@ -69,6 +69,8 @@ try {
     # Include its complete PS 5.1 dependencies and an offline NuGet provider.
     Save-Module -Name PackageManagement -RequiredVersion '1.4.8.1' -Repository PSGallery -Path $modules -Force
     Save-Module -Name PowerShellGet -RequiredVersion '2.2.5' -Repository PSGallery -Path $modules -Force
+    # OSDCloud expands ZIP driver packs during deployment, after its GUI opens.
+    Save-Module -Name Microsoft.PowerShell.Archive -RequiredVersion '1.2.5' -Repository PSGallery -Path $modules -Force
     $provider = Get-PackageProvider -Name NuGet -ListAvailable |
         Where-Object { $_.Version -ge [version]'2.8.5.201' } | Sort-Object Version -Descending | Select-Object -First 1
     if (-not $provider -or -not (Test-Path -LiteralPath $provider.ProviderPath -PathType Leaf)) {
