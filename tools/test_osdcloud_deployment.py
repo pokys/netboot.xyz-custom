@@ -287,7 +287,8 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                         qmp('human-monitor-command', {'command-line': 'sendkey x'})
                         restored_console = True
                         print('Requested restoration of the minimized deployment console.', flush=True)
-                    if clicked and not confirmed and 'clear-disk' in normalized and 'disk 0' in normalized and 'confirm' in normalized:
+                    if (clicked and not confirmed and 'clear-disk' in normalized and 'confirm' in normalized and
+                            re.search('(?<![a-z0-9])disk +[0o@] ', normalized)):
                         # The guest guard and fresh qcow2 ensure this can only erase the CI test disk.
                         type_command('y')
                         confirmed = True
