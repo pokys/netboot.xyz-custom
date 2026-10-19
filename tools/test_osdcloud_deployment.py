@@ -107,7 +107,8 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
     nic = 'e1000' if devices == 'sata' else 'vmxnet3' if devices == 'vmware' else 'virtio-net-pci'
     command.extend(['-nic', f'user,model={nic},tftp={tftp},bootfile=boot.ipxe'])
     if devices == 'sata':
-        command.extend(['-drive', f'file={disk},format=qcow2,if=ide,serial=OSDCLOUD-CI-ONLY'])
+        command.extend(['-drive', f'file={disk},format=qcow2,if=none,id=testdisk',
+                        '-device', 'ide-hd,drive=testdisk,bus=ide.0,serial=OSDCLOUD-CI-ONLY'])
     else:
         command.extend(['-drive', f'file={disk},format=qcow2,if=none,id=testdisk'])
         if devices == 'virtio-blk':
