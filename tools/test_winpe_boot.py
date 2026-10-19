@@ -131,7 +131,7 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
                         # Getting this far proves Get-Disk saw the only attached test disk.
                         qmp('human-monitor-command', {'command-line': 'sendkey ret'})
                         time.sleep(2)
-                        type_command('powershell -nop -c "import-module powershellget -requiredversion 2.2.5 -ea stop; '
+                        type_command('powershell -nop -ep bypass -c "import-module powershellget -requiredversion 2.2.5 -ea stop; '
                                      'import-packageprovider nuget -minimumversion 2.8.5.201 -ea stop | out-null; '
                                      'find-module osd -requiredversion 26.10.6.1 -ea stop | out-null; '
                                      f'irm {base}/network-probe.txt"')
@@ -139,6 +139,10 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
                     if probe_started and 'winpe-network-powershellget-pass' in normalized:
                         print('PASS: Test disk visible, HTTP networking and PowerShellGet/NuGet/Find-Module work. No deployment started.', flush=True)
                         return
+                    if not probe_started and 'returned to winpe' in normalized:
+                        raise RuntimeError('WinPE launcher failed before its confirmation prompt; see screenshot')
+                    if 'running scripts is disabled' in normalized or 'could not be loaded' in normalized:
+                        raise RuntimeError('A PowerShell module failed to load; see screenshot')
                     if '0xc000000f' in normalized or 'boot configuration data' in normalized:
                         raise RuntimeError('Windows Boot Manager rejected the boot configuration')
             raise TimeoutError('WinPE did not reach its confirmation prompt; see screenshot')
