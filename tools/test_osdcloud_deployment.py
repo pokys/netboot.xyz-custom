@@ -17,6 +17,7 @@ import os
 import shutil
 import socket
 import subprocess
+import tempfile
 import threading
 import time
 from pathlib import Path
@@ -91,7 +92,8 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
     (tftp / 'boot.ipxe').write_text(script)
     disk = work / 'blank-test-disk.qcow2'
     subprocess.run(['qemu-img', 'create', '-f', 'qcow2', str(disk), '80G'], check=True)
-    sockpath = work / 'qmp.sock'
+    socket_dir = tempfile.TemporaryDirectory(prefix='osd-qmp-')
+    sockpath = Path(socket_dir.name) / 'qmp.sock'
     kvm = os.path.exists('/dev/kvm') and os.access('/dev/kvm', os.W_OK)
     command = [
         'qemu-system-x86_64', '-machine', 'q35',
@@ -288,6 +290,7 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
             except subprocess.TimeoutExpired:
                 process.kill()
                 process.wait()
+            socket_dir.cleanup()
 
 
 if __name__ == '__main__':
