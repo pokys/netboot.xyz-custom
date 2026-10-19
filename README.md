@@ -204,18 +204,6 @@ samotný základní ADK WIM neobsahuje kompletní bootovací médium.
 Binární obrazy a pracovní soubory Git ignoruje. Žádné Windows ISO se při buildu nestahuje.
 Build nespouští instalaci Windows ani neformátuje disk.
 
-Při ověřování v Proxmoxu pomohla u testované VM změna CPU na `host`;
-s původním `x86-64-v2-AES` se PE zastavilo na logu. Jde o výsledek konkrétního testu,
-nikoli o požadavek měnit všechny VM. CI používá KVM s CPU `host`.
-
-Ve VMware Workstation používej profil **Windows 11 x64**, firmware **UEFI**
-a podporovaný řadič systémového disku. U testované VM s diskem na SATA zůstával
-zapnutý prázdný LSI SCSI řadič a profil Other Linux / BIOS; po změně profilu,
-UEFI a vypnutí tohoto řadiče PE prošlo inicializací a začalo kontrolovat závislosti.
-Samostatně tím není prokázaná příčina původního `DRIVER_PNP_WATCHDOG`.
-CI testy VMware řadičů používají PVSCSI a VMXNET3 emulované v QEMU;
-ověření ve VMware Workstation je další ruční test.
-
 Síťové a storage ovladače musí být dostupné už ve WinPE. Chybějící rozbalené podepsané x64 INF ovladače přidej takto:
 
 ```powershell

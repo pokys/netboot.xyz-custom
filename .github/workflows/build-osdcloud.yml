@@ -9,12 +9,11 @@ permissions:
 env:
   OSDCLOUD_RELEASE_TAG: osdcloud-v9
 
-concurrency:
-  group: osdcloud-boot-files
-  cancel-in-progress: false
-
 jobs:
   build:
+    concurrency:
+      group: osdcloud-boot-files-build
+      cancel-in-progress: false
     runs-on: windows-2022
     timeout-minutes: 60
     outputs:
