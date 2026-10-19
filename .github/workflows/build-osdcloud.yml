@@ -17,6 +17,8 @@ jobs:
   build:
     runs-on: windows-2022
     timeout-minutes: 60
+    outputs:
+      release_tag: ${{ steps.release.outputs.tag }}
     defaults:
       run:
         shell: powershell
@@ -40,6 +42,7 @@ jobs:
             Get-FileHash -Algorithm SHA256 | ForEach-Object { '{0}  {1}' -f $_.Hash.ToLowerInvariant(), [IO.Path]::GetFileName($_.Path) } |
             Set-Content artifacts/osdcloud/SHA256SUMS -Encoding Ascii
       - name: Verify and publish boot files
+        id: release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -66,6 +69,7 @@ jobs:
           if ($env:OSDCLOUD_RELEASE_TAG -in @($releases.tagName)) { throw 'Release already exists; refusing to replace published boot files.' }
           gh release create "$env:OSDCLOUD_RELEASE_TAG" @files --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title 'Windows 10/11 OSDCloud PE v6 (netboot and ISO)' --notes-file artifacts/osdcloud/release-notes.txt --latest=false
           if ($LASTEXITCODE -ne 0) { throw 'Boot file publication failed' }
+          "tag=$env:OSDCLOUD_RELEASE_TAG" | Out-File -FilePath $env:GITHUB_OUTPUT -Encoding utf8 -Append
 
   boot-smoke:
     needs: build
@@ -109,3 +113,9 @@ jobs:
             .build/winpe-smoke*/*.png
             .build/winpe-smoke*/*.txt
             .build/winpe-smoke*/*.log
+
+  deployment:
+    needs: build
+    uses: ./.github/workflows/test-osdcloud-deployment.yml
+    with:
+      release_tag: ${{ needs.build.outputs.release_tag }}

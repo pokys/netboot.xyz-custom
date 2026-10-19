@@ -1,0 +1,60 @@
+name: Validate complete OSDCloud deployments
+on:
+  workflow_dispatch:
+    inputs:
+      release_tag:
+        description: Published PE release to validate
+        required: true
+        default: osdcloud-v6
+        type: string
+  workflow_call:
+    inputs:
+      release_tag:
+        required: true
+        type: string
+permissions:
+  contents: read
+jobs:
+  deploy:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 100
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - {os: windows11, boot: netboot, firmware: uefi, devices: virtio-scsi}
+          - {os: windows10, boot: iso, firmware: bios, devices: sata}
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Prepare the disposable VM host
+        run: |
+          test "$GITHUB_ACTIONS" = true
+          test "$RUNNER_ENVIRONMENT" = github-hosted
+          # Reclaim unused SDK caches only on this disposable runner, never a user PC.
+          sudo rm -rf -- /usr/share/dotnet /usr/local/lib/android /opt/ghc
+          sudo docker image prune --all --force
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf ipxe tesseract-ocr p7zip-full
+          test -e /dev/kvm
+          sudo chmod a+rw /dev/kvm
+          df -h .
+      - name: Download the published PE and ISO
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ inputs.release_tag }}
+        run: gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir artifacts/osdcloud
+      - name: Deploy Windows only into the new CI disk and verify installed boot
+        run: python -u -m tools.test_osdcloud_deployment artifacts/osdcloud --boot "${{ matrix.boot }}" --firmware "${{ matrix.firmware }}" --devices "${{ matrix.devices }}" --os "${{ matrix.os }}"
+      - name: Save deployment evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: deployment-${{ matrix.os }}-${{ matrix.boot }}-${{ matrix.firmware }}-${{ matrix.devices }}
+          include-hidden-files: true
+          path: |
+            .build/winpe-deploy*/**/*.json
+            .build/winpe-deploy*/**/*.png
+            .build/winpe-deploy*/**/*.txt
+            .build/winpe-deploy*/**/*.log
