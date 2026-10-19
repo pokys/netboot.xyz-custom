@@ -84,6 +84,12 @@ try {
     Copy-Item -LiteralPath $provider.ProviderPath -Destination $providerFolder
     if ($DriverPath -and (Test-Path -LiteralPath (Join-Path $DriverPath 'winpe-virtual-drivers.json'))) {
         Copy-Item -LiteralPath (Join-Path $DriverPath 'winpe-virtual-drivers.json') -Destination (Join-Path $OutputPath 'virtual-drivers.json')
+        # PE drivers do not automatically enter the deployed Windows driver store.
+        # Keep the same verified packages for OSDCloud's post-apply shutdown hook.
+        $targetDrivers = New-Item -ItemType Directory -Path (Join-Path $mount.FullName 'ProgramData\OSDCloud\VirtualDrivers') -Force
+        Get-ChildItem -LiteralPath $DriverPath | Copy-Item -Destination $targetDrivers.FullName -Recurse
+        $shutdownScripts = New-Item -ItemType Directory -Path (Join-Path $mount.FullName 'OSDCloud\Config\Scripts\Shutdown') -Force
+        Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\Install-VirtualTargetDrivers.ps1') -Destination $shutdownScripts.FullName
     }
     # Preserve the injected provider/version evidence in the release artifacts.
     Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Get-Drivers', '/Format:Table')

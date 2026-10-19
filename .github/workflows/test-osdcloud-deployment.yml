@@ -24,6 +24,7 @@ jobs:
         include:
           - {os: windows11, boot: netboot, firmware: uefi, devices: virtio-scsi}
           - {os: windows10, boot: iso, firmware: bios, devices: sata}
+          - {os: windows10, boot: iso, firmware: uefi, devices: vmware}
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
         with:

@@ -4,7 +4,7 @@
 param(
     [Parameter(Mandatory = $true)][string]$Server,
     [ValidateSet('windows10','windows11')][string]$OS = 'windows11',
-    [ValidateSet('sata','virtio-scsi')][string]$Devices = 'virtio-scsi'
+    [ValidateSet('sata','virtio-scsi','vmware')][string]$Devices = 'virtio-scsi'
 )
 $ErrorActionPreference = 'Stop'
 [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
@@ -67,6 +67,13 @@ try {
     if ($Devices -eq 'virtio-scsi' -and -not ($drivers | Where-Object {$_.OriginalFileName -match 'vioscsi\.inf$'})) {
         throw 'VirtIO SCSI driver was not staged into the deployed Windows image.'
     }
+    if ($Devices -eq 'vmware') {
+        foreach ($name in @('pvscsi.inf','vmxnet3.inf')) {
+            if (-not ($drivers | Where-Object {[IO.Path]::GetFileName($_.OriginalFileName) -ieq $name})) {
+                throw "VMware target driver was not staged: $name"
+            }
+        }
+    }
     & wpeutil.exe UpdateBootInfo | Out-Null
     $firmware = (Get-ItemProperty 'HKLM:\SYSTEM\CurrentControlSet\Control' -Name PEFirmwareType).PEFirmwareType
     $partitions = @(Get-Partition -DiskNumber 0)
@@ -95,7 +102,7 @@ try {
         if ($OS -eq 'windows10' -and [int]$version.CurrentBuildNumber -ge 22000) { throw 'Expected Windows 10.' }
         $result = @{Completed=$true; GuardPassed=$guardPassed; OS=$OS; Build=$version.CurrentBuildNumber; Edition=$version.EditionID;
             Firmware=$firmware; BCD=$bcd; Partitions=$partitions.Count; KernelPresent=$true;
-            Drivers=@($drivers | Where-Object {$_.OriginalFileName -match 'vioscsi|netkvm'} | Select-Object Driver,OriginalFileName,Version)}
+            Drivers=@($drivers | Where-Object {$_.OriginalFileName -match 'vioscsi|netkvm|pvscsi|vmxnet3'} | Select-Object Driver,OriginalFileName,Version)}
     }
     finally { & reg.exe unload HKLM\OSD_CI_SOFTWARE | Out-Null }
     Send-Report 'deployment' $result

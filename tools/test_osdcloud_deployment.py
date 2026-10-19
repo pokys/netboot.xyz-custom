@@ -179,6 +179,7 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                     qmp('human-monitor-command', {'command-line': 'sendkey ret'})
 
                 launched = clicked = confirmed = False
+                confirmation_deadline = time.monotonic() + 900
                 previous = ''
                 while time.monotonic() < deadline:
                     time.sleep(10)
@@ -228,6 +229,8 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                         print('Confirmed clearing the single disposable CI disk.', flush=True)
                     if not launched and 'returned to winpe' in normalized:
                         raise RuntimeError('WinPE prerequisite validation failed before deployment')
+                    if not confirmed and time.monotonic() > confirmation_deadline:
+                        raise TimeoutError('The guarded GUI/disk-confirmation stages did not finish within 15 minutes; see screen.txt')
                 else:
                     raise TimeoutError('OSDCloud did not complete the deployment within one hour')
 
@@ -300,7 +303,7 @@ if __name__ == '__main__':
     parser.add_argument('--firmware', choices=('bios', 'uefi'), default='uefi')
     parser.add_argument('--memory', type=int, default=8192)
     parser.add_argument('--boot', choices=('netboot', 'iso'), default='netboot')
-    parser.add_argument('--devices', choices=('sata', 'virtio-scsi'), default='virtio-scsi')
+    parser.add_argument('--devices', choices=('sata', 'virtio-scsi', 'vmware'), default='virtio-scsi')
     parser.add_argument('--os', choices=('windows10', 'windows11'), default='windows11')
     args = parser.parse_args()
     run(args.assets.resolve(), args.firmware, args.memory, args.devices, args.boot, args.os)

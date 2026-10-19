@@ -28,6 +28,7 @@
   },
   {
     "name": "VMware-PVSCSI",
+    "targetMinBuild": 20124,
     "version": "1.3.29.0",
     "catalogId": "3dbcc799-e963-4f18-9cc4-3f5411ae7c37",
     "url": "https://catalog.s.download.windowsupdate.com/c/msdownload/update/driver/drvs/2024/12/dcbf29bf-7845-4d1b-9fe8-7b727295a3ae_27bff030d90110e6c3fae72f106f31d9cf8b745b.cab",
@@ -37,10 +38,31 @@
   },
   {
     "name": "VMware-VMXNET3",
+    "targetMinBuild": 26100,
     "version": "1.9.21.0",
     "catalogId": "219135d9-f346-4e42-b3d0-09017406dcee",
     "url": "https://catalog.s.download.windowsupdate.com/d/msdownload/update/driver/drvs/2026/07/cf7c5218-fd6d-4f0f-b376-dde4c97289ca_604c6fab636da81ba79a6438ddad6f6a89eaadf6.cab",
     "sha256": "4f8b5e1b18a848819bf2c2d8a8587c79ca2209cb9a648168f843c7423048d47c",
+    "inf": "vmxnet3.inf",
+    "catalog": "vmxnet3.cat"
+  },
+  {
+    "name": "VMware-PVSCSI-Compatible",
+    "targetMaxBuild": 20123,
+    "version": "1.3.29.0",
+    "catalogId": "aefa25e9-975c-462c-b8bd-e4183ceeeae1",
+    "url": "https://catalog.s.download.windowsupdate.com/d/msdownload/update/driver/drvs/2024/12/d6f05493-4103-4725-a485-554817879f55_430176e127434fd90671dce4bff19857b3b377f0.cab",
+    "sha256": "2d9ef8f4f70f476c32f979dd7c3694c65585a3ad024c4e290aaccaf98863a567",
+    "inf": "pvscsi.inf",
+    "catalog": "pvscsi.cat"
+  },
+  {
+    "name": "VMware-VMXNET3-Compatible",
+    "targetMaxBuild": 26099,
+    "version": "1.9.21.0",
+    "catalogId": "d1cd0021-bb74-4958-ac4c-b6b7938b7c45",
+    "url": "https://catalog.s.download.windowsupdate.com/c/msdownload/update/driver/drvs/2026/07/52fbf5ad-3f2a-43f4-9678-a3e2fc58fd91_6d3517bfc4f3143ccf5f2735ee0bf4f207501417.cab",
+    "sha256": "91a021c0eb24c1f22ed7af7ac4bc5f15fcaeb5c8d6f62a9e199b1d38ac05f2ba",
     "inf": "vmxnet3.inf",
     "catalog": "vmxnet3.cat"
   }
