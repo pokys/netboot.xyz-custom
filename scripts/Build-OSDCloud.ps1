@@ -108,7 +108,7 @@ try {
         NuGet = $provider.Version.ToString()
         ProbeUrl = "https://raw.githubusercontent.com/pokys/netboot.xyz-custom/$revision/winpe/runtime-probe.txt"
         OptionalComponents = $packages
-        Utilities = @(Get-Content -LiteralPath (Join-Path $mount.FullName 'ProgramData\OSDCloud\utilities.json') -Raw | ConvertFrom-Json)
+        Utilities = @((Get-Content -LiteralPath (Join-Path $mount.FullName 'ProgramData\OSDCloud\utilities.json') -Raw | ConvertFrom-Json) | ForEach-Object { $_ })
         OSDDownloaderSHA256 = (Get-FileHash -LiteralPath (Join-Path $modules 'OSD\26.10.6.1\Public\Functions\Save-WebFile.ps1') -Algorithm SHA256).Hash.ToLowerInvariant()
     }
     $runtime | ConvertTo-Json -Depth 7 | Set-Content -LiteralPath (Join-Path $system32 'osdcloud-runtime.json') -Encoding UTF8
