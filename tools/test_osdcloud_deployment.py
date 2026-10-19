@@ -215,6 +215,7 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                     qmp('human-monitor-command', {'command-line': 'sendkey ret'})
 
                 launched = clicked = confirmed = False
+                restored_console = False
                 confirmation_deadline = time.monotonic() + 900
                 previous = ''
                 while time.monotonic() < deadline:
@@ -253,6 +254,19 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                             qmp('input-send-event', {'events': [{'type': 'btn', 'data': {'button': 'left', 'down': False}}]})
                             clicked = True
                             print('Clicked the actual OSDCloud GUI Start button after the blank CI disk guard.', flush=True)
+                    if clicked and not confirmed and not normalized and not restored_console:
+                        # OSD minimizes the inherited cmd window while showing its GUI.
+                        # Its PowerShell MainWindowHandle can be zero for that console,
+                        # leaving the disk prompt minimized after the GUI closes.
+                        # Restore the application through normal window shortcuts;
+                        # the disk confirmation still requires the explicit OCR gate.
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-tab'})
+                        time.sleep(1)
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-spc'})
+                        time.sleep(1)
+                        qmp('human-monitor-command', {'command-line': 'sendkey x'})
+                        restored_console = True
+                        print('Requested restoration of the minimized deployment console.', flush=True)
                     if clicked and not confirmed and 'clear-disk' in normalized and 'disk 0' in normalized and 'confirm' in normalized:
                         # The guest guard and fresh qcow2 ensure this can only erase the CI test disk.
                         type_command('y')
