@@ -58,7 +58,20 @@ try {
     }
     Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Set-ScratchSpace:512')
     if ($DriverPath) {
-        Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Driver', "/Driver:$([IO.Path]::GetFullPath($DriverPath))", '/Recurse')
+        $driverManifest = Join-Path $DriverPath 'winpe-virtual-drivers.json'
+        if (Test-Path -LiteralPath $driverManifest) {
+            $peDrivers = @((Get-Content -LiteralPath $driverManifest -Raw | ConvertFrom-Json) | Where-Object {$_.pe -ne $false})
+            if (@($peDrivers | Group-Object inf | Where-Object Count -gt 1).Count -gt 0) {
+                throw 'Select only one variant of each driver INF for the PE image.'
+            }
+            foreach ($driver in $peDrivers) {
+                $inf = Join-Path (Join-Path ([IO.Path]::GetFullPath($DriverPath)) $driver.name) $driver.inf
+                Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Driver', "/Driver:$inf")
+            }
+        }
+        else {
+            Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Driver', "/Driver:$([IO.Path]::GetFullPath($DriverPath))", '/Recurse')
+        }
     }
     # Pin the PowerShell 5.1-compatible OSD implementation used by this launcher.
     # This is the standalone OSD module, not the newer OSDeploy build tooling.
