@@ -40,7 +40,7 @@ function Test-OSDCloudRequirements {
         foreach ($name in @('Start-OSDCloudGUI','Save-WebFile','Get-Disk','Get-Partition','New-Partition','Clear-Disk','Format-Volume',
             'Get-WindowsImage','Expand-WindowsImage','Add-WindowsDriver','Get-WindowsEdition','Get-CimInstance',
             'Compress-Archive','Expand-Archive','Get-FileHash','Invoke-WebRequest','bcdboot.exe','dism.exe','diskpart.exe',
-            'reg.exe','expand.exe','wpeutil.exe','net.exe','robocopy.exe','manage-bde.exe','setx.exe','curl.exe','7za.exe')) {
+            'reg.exe','expand.exe','wpeutil.exe','net.exe','robocopy.exe','manage-bde.exe','mountvol.exe','setx.exe','curl.exe','7za.exe')) {
             Get-Command -Name $name -ErrorAction Stop
         }
     }
