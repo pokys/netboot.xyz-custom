@@ -1,0 +1,45 @@
+name: Build direct WinPE v4 diagnostic ISO
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: osdcloud-v4-direct-iso
+  cancel-in-progress: false
+jobs:
+  build:
+    runs-on: windows-2022
+    timeout-minutes: 30
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        with:
+          persist-credentials: false
+      - name: Download the existing WinPE v4 image
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release download osdcloud-v4 --repo "$env:GITHUB_REPOSITORY" --dir artifacts/osdcloud --pattern boot.wim --pattern SHA256SUMS
+          if ($LASTEXITCODE -ne 0) { throw 'Source WinPE download failed.' }
+      - name: Install ADK on the disposable runner
+        run: ./scripts/Install-BuildPrerequisites.ps1
+      - name: Wrap the unchanged WIM in BIOS and UEFI boot media
+        run: ./scripts/Build-OSDCloudIso.ps1
+      - name: Publish the diagnostic ISO
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $ErrorActionPreference = 'Stop'
+          $releases = gh release list --repo "$env:GITHUB_REPOSITORY" --limit 100 --json tagName | ConvertFrom-Json
+          if ($LASTEXITCODE -ne 0) { throw 'Could not check releases.' }
+          if ('osdcloud-v4-iso' -in @($releases.tagName)) { throw 'Diagnostic release already exists; refusing replacement.' }
+          $notes = @'
+          Direct BIOS/x64 UEFI boot ISO for comparing hypervisor startup against iPXE/wimboot.
+
+          Contains the unchanged, checksum-verified boot.wim from osdcloud-v4 and matching Microsoft ADK/WinPE boot media. No iPXE or wimboot is used. See SOURCE-WIM-SHA256.txt and SHA256SUMS. The OSDCloud launcher remains interactive; starting a deployment can erase internal disks. This release does not claim a completed Windows installation test.
+          '@
+          $notes | Set-Content artifacts/osdcloud-iso/notes.txt -Encoding UTF8
+          gh release create osdcloud-v4-iso artifacts/osdcloud-iso/osdcloud-v4-direct.iso artifacts/osdcloud-iso/SHA256SUMS artifacts/osdcloud-iso/SOURCE-WIM-SHA256.txt --repo "$env:GITHUB_REPOSITORY" --target "$env:GITHUB_SHA" --title 'WinPE v4 direct boot diagnostic ISO' --notes-file artifacts/osdcloud-iso/notes.txt --prerelease --latest=false
+          if ($LASTEXITCODE -ne 0) { throw 'Diagnostic ISO publication failed.' }

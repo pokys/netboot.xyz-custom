@@ -23,7 +23,15 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
         digest, name = line.split()
         with (assets / name).open('rb') as source:
             assert hashlib.file_digest(source, 'sha256').hexdigest() == digest
-    server = ThreadingHTTPServer(('127.0.0.1', 0), partial(SimpleHTTPRequestHandler, directory=str(assets)))
+    network_probe_received = threading.Event()
+
+    class BootFileHandler(SimpleHTTPRequestHandler):
+        def do_GET(self):
+            super().do_GET()
+            if self.path == '/network-probe.txt':
+                network_probe_received.set()
+
+    server = ThreadingHTTPServer(('127.0.0.1', 0), partial(BootFileHandler, directory=str(assets)))
     threading.Thread(target=server.serve_forever, daemon=True).start()
     base = f'http://10.0.2.2:{server.server_port}'
     (assets / 'network-probe.txt').write_text('WINPE-NETWORK-POWERSHELLGET-PASS')
@@ -136,7 +144,9 @@ def run(assets, firmware='bios', memory=8192, devices='sata'):
                                      'find-module osd -requiredversion 26.10.6.1 -ea stop | out-null; '
                                      f'irm {base}/network-probe.txt"')
                         probe_started = True
-                    if probe_started and 'winpe-network-powershellget-pass' in normalized:
+                    # Use the actual HTTP request rather than OCR of its result.
+                    # Small console glyphs can turn WINPE into JINPE in Tesseract.
+                    if probe_started and network_probe_received.is_set():
                         print('PASS: Test disk visible, HTTP networking and PowerShellGet/NuGet/Find-Module work. No deployment started.', flush=True)
                         return
                     if not probe_started and 'returned to winpe' in normalized:
