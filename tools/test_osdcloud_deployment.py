@@ -13,12 +13,32 @@ import json
 import os
 import shutil
 import socket
+import struct
 import subprocess
 import tempfile
 import threading
 import time
 from pathlib import Path
 from PIL import Image
+
+
+def create_efi_usb_disk(image):
+    """Create a real MBR/FAT32 USB filesystem, without QEMU's virtual FAT layer."""
+    start, sectors = 2048, 262144
+    mbr = bytearray(512)
+    struct.pack_into('<I', mbr, 440, 0x4F534443)
+    struct.pack_into('<B3sB3sII', mbr, 446, 0x80, b'\xfe\xff\xff',
+                     0x0C, b'\xfe\xff\xff', start, sectors)
+    mbr[510:512] = b'\x55\xaa'
+    with image.open('xb') as target:
+        target.write(mbr)
+        target.truncate((start + sectors) * 512)
+    subprocess.run(['mkfs.fat', '--offset', str(start), '-h', str(start), '-F', '32', '-n', 'NETBOOT',
+                    str(image), str(sectors // 2)], check=True)
+    filesystem = f'{image}@@{start * 512}'
+    subprocess.run(['mmd', '-i', filesystem, '::/EFI', '::/EFI/BOOT'], check=True)
+    subprocess.run(['mcopy', '-i', filesystem, '/usr/lib/ipxe/ipxe.efi',
+                    '::/EFI/BOOT/BOOTX64.EFI'], check=True)
 
 
 def find_start_button(screenshot):
@@ -160,10 +180,9 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
         command.extend(['-drive', f'if=pflash,format=raw,readonly=on,file={code}',
                         '-drive', f'if=pflash,format=raw,file={variables}'])
         if boot_source == 'netboot':
-            efi = work / 'efi-boot' / 'EFI' / 'BOOT'
-            efi.mkdir(parents=True)
-            shutil.copyfile('/usr/lib/ipxe/ipxe.efi', efi / 'BOOTX64.EFI')
-            command.extend(['-drive', f'if=none,id=efi,file=fat:rw:{work / "efi-boot"},format=raw',
+            efi = work / 'efi-usb.img'
+            create_efi_usb_disk(efi)
+            command.extend(['-drive', f'if=none,id=efi,file={efi},format=raw',
                             '-device', 'qemu-xhci', '-device', 'usb-storage,drive=efi,bootindex=1'])
     elif boot_source == 'netboot':
         command.extend(['-kernel', '/usr/lib/ipxe/ipxe.lkrn'])
@@ -243,7 +262,8 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                                      f'iwr -usebasicparsing {base}/ci-deploy.ps1 -outfile x:/ci-deploy.ps1; '
                                      f'& x:/ci-deploy.ps1 -server {base} -os {os_version} -devices {devices}"')
                         launched = True
-                    if launched and not clicked and reports.get('ready.json', {}).get('GuardPassed') and 'deployment options' in normalized:
+                    if (launched and not clicked and reports.get('ready.json', {}).get('GuardPassed') and
+                            ('deployment options' in normalized or 'osdcloudgui' in normalized)):
                         button = find_start_button(screenshot)
                         if button:
                             x, y, width, height = button
