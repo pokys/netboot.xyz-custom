@@ -2,8 +2,8 @@
 $ErrorActionPreference = 'Stop'
 $root = Split-Path $PSScriptRoot -Parent
 $errorsFound = @()
-Get-ChildItem -LiteralPath $root -Recurse -Include '*.ps1','*.psm1' |
-    Where-Object { $_.FullName -notmatch '[\\/](\.git|\.build|artifacts)[\\/]' } |
+Get-ChildItem -LiteralPath $root -Recurse -File |
+    Where-Object { $_.Extension -in @('.ps1', '.psm1') -and $_.FullName -notmatch '[\\/](\.git|\.build|artifacts)[\\/]' } |
     ForEach-Object {
         $parseErrors = $null
         [Management.Automation.Language.Parser]::ParseFile($_.FullName, [ref]$null, [ref]$parseErrors) | Out-Null

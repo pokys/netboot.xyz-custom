@@ -25,7 +25,7 @@ def run(assets, firmware='bios', memory=8192, devices='sata', boot_source='netbo
             assert hashlib.file_digest(source, 'sha256').hexdigest() == digest
     if boot_source == 'iso':
         # Verify artifact parity by reading the actual WIM from the published ISO.
-        extractor = subprocess.Popen(['7z', 'x', '-so', str(assets / 'osdcloud.iso'), 'sources/boot.wim'],
+        extractor = subprocess.Popen(['7z', 'x', '-so', '-ssc-', str(assets / 'osdcloud.iso'), 'sources/boot.wim'],
                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         embedded_hash = hashlib.file_digest(extractor.stdout, 'sha256').hexdigest()
         extractor.stdout.close()
