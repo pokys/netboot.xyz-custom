@@ -5,7 +5,7 @@ on:
       release_tag:
         description: Published PE release to validate
         required: true
-        default: osdcloud-v7
+        default: osdcloud-v8
         type: string
       target:
         description: Deployment scenario

@@ -152,6 +152,8 @@ jeho hash je také v `SOURCE-WIM-SHA256.txt`. Obraz obsahuje podepsané x64 ovla
 VirtIO Block, NetKVM, VMware PVSCSI a VMXNET3. CAB balíčky z Microsoft Update
 Catalog mají připnuté SHA256 a build ověřuje podpisy Microsoft WHCP.
 Seznam verzí a zdrojů je v `scripts/winpe-virtual-drivers.json` a v release.
+Záznamy s `pe: false` jsou kompatibilní varianty jen pro cílový systém;
+do PE se neinjektují. Build odmítne více variant stejného INF v PE.
 Build přibalí stejné podepsané balíčky i pro cílové Windows. Závěrečný hook OSDCloud
 je přidá do offline instalace při detekci VirtIO nebo VMware PCI zařízení;
 u VMware vybere variantu INF podle buildu cílového jádra, protože balíčky pro novější
@@ -206,6 +208,14 @@ Při ověřování v Proxmoxu pomohla u testované VM změna CPU na `host`;
 s původním `x86-64-v2-AES` se PE zastavilo na logu. Jde o výsledek konkrétního testu,
 nikoli o požadavek měnit všechny VM. CI používá KVM s CPU `host`.
 
+Ve VMware Workstation používej profil **Windows 11 x64**, firmware **UEFI**
+a podporovaný řadič systémového disku. U testované VM s diskem na SATA zůstával
+zapnutý prázdný LSI SCSI řadič a profil Other Linux / BIOS; po změně profilu,
+UEFI a vypnutí tohoto řadiče PE prošlo inicializací a začalo kontrolovat závislosti.
+Samostatně tím není prokázaná příčina původního `DRIVER_PNP_WATCHDOG`.
+CI testy VMware řadičů používají PVSCSI a VMXNET3 emulované v QEMU;
+ověření ve VMware Workstation je další ruční test.
+
 Síťové a storage ovladače musí být dostupné už ve WinPE. Chybějící rozbalené podepsané x64 INF ovladače přidej takto:
 
 ```powershell
@@ -224,10 +234,10 @@ Pro opakovaný build zvol nové adresáře:
 Výchozí menu očekává tyto adresy:
 
 ```text
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/boot.wim
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/wimboot
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/BCD
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v7/boot.sdi
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v8/boot.wim
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v8/wimboot
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v8/BCD
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v8/boot.sdi
 ```
 
 Po ručním buildu vytvoř GitHub Release s novým tagem a přilož všechny čtyři soubory
