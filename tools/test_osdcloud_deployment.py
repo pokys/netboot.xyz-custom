@@ -206,8 +206,10 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                                      f'iwr -usebasicparsing {base}/ci-deploy.ps1 -outfile x:/ci-deploy.ps1; '
                                      f'& x:/ci-deploy.ps1 -server {base} -os {os_version} -devices {devices}"')
                         launched = True
-                    if launched and not clicked and reports.get('ready.json', {}).get('GuardPassed') and 'operating system' in normalized:
-                        tsv = subprocess.check_output(['tesseract', str(screenshot), 'stdout', 'tsv'], stderr=subprocess.DEVNULL, text=True)
+                    if launched and not clicked and reports.get('ready.json', {}).get('GuardPassed') and 'deployment options' in normalized:
+                        # Sparse mode also finds the white Start label on its blue button.
+                        # Automatic page segmentation can omit colored GUI labels entirely.
+                        tsv = subprocess.check_output(['tesseract', str(screenshot), 'stdout', '--psm', '11', 'tsv'], stderr=subprocess.DEVNULL, text=True)
                         width, height = struct.unpack('>II', screenshot.read_bytes()[16:24])
                         buttons = [row for row in csv.DictReader(io.StringIO(tsv), delimiter='\t')
                                    if row['text'].strip().lower() == 'start' and int(row['left']) > width * 0.4 and int(row['top']) > height * 0.4]
