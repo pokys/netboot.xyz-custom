@@ -255,9 +255,12 @@ set github_user pokys
 ```
 
 netboot.xyz načte `https://raw.githubusercontent.com/pokys/netboot.xyz-custom/master/custom.ipxe`.
-Vyber **Windows 10 / 11 - OSDCloud installer**, potom **Start Windows 10 / 11 installer**.
+Vyber **Windows 10 / 11 - OSDCloud installer**, potom **Boot Windows PE / OSDCloud**.
 Tato položka zavádí x64 WinPE přes **BIOS i x64 UEFI**. V BIOS režimu ověřuje
 64bitový procesor pomocí `cpuid`, protože samotné iPXE bývá sestavené jako `i386`.
+**Samotná instalace OSDCloud vyžaduje UEFI.** OSDCloud připravuje cílový disk jako GPT;
+BIOS boot PE slouží k diagnostice a nepotvrzuje podporu BIOS instalace Windows.
+Viz [požadavek OSDCloud na VM generace 2 / UEFI](https://www.osdcloud.com/osdcloud-v1/osdcloud/setup/osdcloud-vm/new-osdcloudvm).
 Pro instalaci Windows 11 použij UEFI; BIOS cesta je určená zejména pro Windows 10.
 
 WinPE inicializuje síť, zobrazí disky a vyžádá potvrzení `INSTALL`.
