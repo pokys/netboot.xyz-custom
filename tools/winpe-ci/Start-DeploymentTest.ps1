@@ -13,16 +13,21 @@ function Send-Report([string]$Name, $Value) {
     Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$Server/evidence/$Name.json" -ContentType 'application/json' -Body ([Text.Encoding]::UTF8.GetBytes($json)) | Out-Null
 }
 function Send-Logs {
-    foreach ($path in @('X:\Windows\Temp\OSDCloud-Requirements.json','X:\ci-deployment.txt','X:\Windows\Logs\DISM\dism.log')) {
-        if (Test-Path -LiteralPath $path -PathType Leaf) {
-            $name = Split-Path $path -Leaf
-            Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$Server/evidence/$name" -ContentType 'text/plain' -InFile $path -ErrorAction SilentlyContinue | Out-Null
-        }
-    }
+    $paths = @('X:\Windows\Temp\OSDCloud-Requirements.json','X:\ci-deployment.txt','X:\Windows\Logs\DISM\dism.log')
     if (Test-Path -LiteralPath 'C:\Windows\TEMP\osdcloud-logs') {
-        Get-ChildItem -LiteralPath 'C:\Windows\TEMP\osdcloud-logs' -File | Where-Object {$_.Extension -in @('.log','.txt','.json')} | ForEach-Object {
-            Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$Server/evidence/osd-$($_.Name)" -ContentType 'text/plain' -InFile $_.FullName -ErrorAction SilentlyContinue | Out-Null
+        $paths += @(Get-ChildItem -LiteralPath 'C:\Windows\TEMP\osdcloud-logs' -File |
+            Where-Object {$_.Extension -in @('.log','.txt','.json')} | Select-Object -ExpandProperty FullName)
+    }
+    $deadline = [DateTime]::UtcNow.AddSeconds(45)
+    foreach ($path in $paths) {
+        if ([DateTime]::UtcNow -ge $deadline) { break }
+        if (-not (Test-Path -LiteralPath $path -PathType Leaf)) { continue }
+        $name = Split-Path $path -Leaf
+        if ($path.StartsWith('C:', [StringComparison]::OrdinalIgnoreCase)) { $name = "osd-$name" }
+        try {
+            Invoke-WebRequest -UseBasicParsing -Method Post -Uri "$Server/evidence/$name" -ContentType 'text/plain' -InFile $path -TimeoutSec 15 -ErrorAction Stop | Out-Null
         }
+        catch { Write-Warning "Could not upload diagnostic ${name}: $($_.Exception.Message)" }
     }
 }
 $guardPassed = $false
@@ -123,7 +128,10 @@ catch {
     throw
 }
 finally {
-    Stop-Transcript -ErrorAction SilentlyContinue | Out-Null
-    if ($guardPassed) { Send-Logs }
+    try { Stop-Transcript -ErrorAction Stop | Out-Null }
+    catch { Write-Warning "Could not stop the CI transcript: $($_.Exception.Message)" }
+    try { if ($guardPassed) { Send-Logs } }
+    catch { Write-Warning "Could not collect CI diagnostics: $($_.Exception.Message)" }
+    # Diagnostic collection must never prevent the validated VM from shutting down.
+    if ($result.Completed) { & wpeutil.exe Shutdown }
 }
-if ($result.Completed) { & wpeutil.exe Shutdown }
