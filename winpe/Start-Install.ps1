@@ -23,10 +23,6 @@ try {
     $disks | Select-Object Number, FriendlyName, BusType, @{Name='SizeGB'; Expression={[math]::Round($_.Size / 1GB)}} | Format-Table -AutoSize
     Write-Warning 'OSDCloud can erase a disk. Verify the target in its installation prompts.'
     Write-Host 'Choose Windows 10 22H2 or a Windows 11 release, edition, and language (cs-cz for Czech) in the next window.'
-    if ((Read-Host 'Type INSTALL to open OSDCloud, or press Enter to cancel') -cne 'INSTALL') {
-        Write-Host 'Cancelled. No deployment was started.'
-        exit 0
-    }
     # Interactive GUI only; never pass ZTI or start an unattended deployment here.
     Start-OSDCloudGUI
 }

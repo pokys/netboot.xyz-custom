@@ -26,7 +26,7 @@ foreach ($file in @('custom.ipxe', 'windows.ipxe', 'esxi.ipxe')) {
 }
 # Mock every external action: never start an actual deployment during tests.
 function Test-Launcher {
-    param([bool]$InWinPE, [string]$Answer, [bool]$HasDisk, [bool]$ExpectGUI, [int]$ExpectedExit)
+    param([bool]$InWinPE, [bool]$HasDisk, [bool]$ExpectGUI, [int]$ExpectedExit)
     $state = @{ GuiCalled = $false }
     function Test-Path { param($Path) return $InWinPE }
     function Import-Module { param($Name, $RequiredVersion, $ErrorAction, [switch]$Force) }
@@ -37,16 +37,20 @@ function Test-Launcher {
     function Get-Disk {
         if ($HasDisk) { [pscustomobject]@{Number=0; FriendlyName='TEST ONLY'; BusType='NVMe'; Size=64GB} }
     }
-    function Read-Host { param($Prompt) return $Answer }
+    function Read-Host { throw 'Launcher must open the GUI without a text confirmation.' }
     function Start-OSDCloudGUI { $state.GuiCalled = $true }
     $global:LASTEXITCODE = 0
     & (Join-Path $root 'winpe\Start-Install.ps1') | Out-Null
     if ($state.GuiCalled -ne $ExpectGUI -or $LASTEXITCODE -ne $ExpectedExit) {
-        throw "Launcher check failed: WinPE=$InWinPE Answer=$Answer HasDisk=$HasDisk"
+        throw "Launcher check failed: WinPE=$InWinPE HasDisk=$HasDisk"
     }
 }
-Test-Launcher -InWinPE $false -Answer INSTALL -HasDisk $true -ExpectGUI $false -ExpectedExit 1
-Test-Launcher -InWinPE $true -Answer '' -HasDisk $true -ExpectGUI $false -ExpectedExit 0
-Test-Launcher -InWinPE $true -Answer INSTALL -HasDisk $false -ExpectGUI $false -ExpectedExit 1
-Test-Launcher -InWinPE $true -Answer INSTALL -HasDisk $true -ExpectGUI $true -ExpectedExit 0
-Write-Host 'PASS: PowerShell syntax, iPXE targets, desktop refusal, cancellation, missing disk, interactive launch.'
+Test-Launcher -InWinPE $false -HasDisk $true -ExpectGUI $false -ExpectedExit 1
+Test-Launcher -InWinPE $true -HasDisk $false -ExpectGUI $false -ExpectedExit 1
+Test-Launcher -InWinPE $true -HasDisk $true -ExpectGUI $true -ExpectedExit 0
+$defaults = Get-Content -LiteralPath (Join-Path $root 'winpe\Start-OSDCloudGUI.json') -Raw | ConvertFrom-Json
+if ((@($defaults.PSObject.Properties.Name | Sort-Object) -join ',') -ne 'OSActivation,OSEdition,OSLanguage' -or
+    $defaults.OSEdition -ne 'Pro' -or $defaults.OSLanguage -ne 'cs-cz' -or $defaults.OSActivation -ne 'Retail') {
+    throw 'GUI defaults must only preselect Pro, cs-cz and Retail; leave OS and hardware detection to OSDCloud.'
+}
+Write-Host 'PASS: PowerShell syntax, iPXE targets, desktop refusal, missing disk, direct interactive GUI, scoped defaults.'

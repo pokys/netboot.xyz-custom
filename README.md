@@ -261,7 +261,7 @@ BIOS boot PE slouží k diagnostice a nepotvrzuje podporu BIOS instalace Windows
 Viz [požadavek OSDCloud na VM generace 2 / UEFI](https://www.osdcloud.com/osdcloud-v1/osdcloud/setup/osdcloud-vm/new-osdcloudvm).
 Pro instalaci Windows 11 použij UEFI; BIOS cesta je určená zejména pro Windows 10.
 
-WinPE inicializuje síť, zobrazí disky a vyžádá potvrzení `INSTALL`.
+WinPE inicializuje síť, zkontroluje požadavky, zobrazí disky a otevře OSDCloud GUI.
 V OSDCloud pak vyber **Windows 10 22H2 x64** nebo požadovanou verzi **Windows 11**,
 edici a jazyk (`cs-cz` pro češtinu). Windows 10 i 11 používají stejné WinPE a wimboot;
 instalační obraz se stahuje z Microsoftu až po výběru v průvodci.

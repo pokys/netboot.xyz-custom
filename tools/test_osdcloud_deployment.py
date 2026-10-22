@@ -220,8 +220,15 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                 qmp('qmp_capabilities')
                 if boot_source == 'iso':
                     for _ in range(20):
-                        qmp('human-monitor-command', {'command-line': 'sendkey spc'})
                         time.sleep(1)
+                        prompt = work / 'cd-prompt.png'
+                        qmp('screendump', {'filename': str(prompt), 'format': 'png'})
+                        prompt_text = subprocess.check_output(['tesseract', str(prompt), 'stdout'], stderr=subprocess.DEVNULL, text=True).lower()
+                        if 'press any key' in prompt_text and 'boot' in prompt_text:
+                            qmp('human-monitor-command', {'command-line': 'sendkey spc'})
+                            break
+                        if 'osdcloud' in prompt_text:
+                            break
 
                 def type_command(text):
                     symbols = {' ': 'spc', '-': 'minus', '.': 'dot', '/': 'slash', ':': 'shift-semicolon',
@@ -234,6 +241,7 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                     qmp('human-monitor-command', {'command-line': 'sendkey ret'})
 
                 launched = clicked = confirmed = False
+                gui_closed = False
                 restored_console = False
                 confirmation_deadline = time.monotonic() + 900
                 previous = ''
@@ -255,9 +263,27 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                     if normalized != previous:
                         print(text[-1900:], flush=True)
                         previous = normalized
-                    if not launched and 'type install' in normalized and 'osdcloud' in normalized:
-                        qmp('human-monitor-command', {'command-line': 'sendkey ret'})
-                        time.sleep(2)
+                    gui_visible = (('deployment options' in normalized or 'osdcloudgui' in normalized) and
+                                   ('operating system' in normalized or 'driver pack' in normalized))
+                    if not launched and not gui_closed and gui_visible:
+                        shutil.copyfile(screenshot, work / 'initial-gui.png')
+                        (work / 'initial-gui.txt').write_text(text)
+                        # Return from the normal GUI without deploying. The guarded CI payload
+                        # configures its own selected OS only after validating the disposable disk.
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-f4'})
+                        time.sleep(3)
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-tab'})
+                        time.sleep(1)
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-spc'})
+                        time.sleep(1)
+                        qmp('human-monitor-command', {'command-line': 'sendkey x'})
+                        gui_closed = True
+                        continue
+                    legacy_prompt = 'type install' in normalized and 'osdcloud' in normalized
+                    if not launched and (legacy_prompt or (gui_closed and 'returned to winpe' in normalized)):
+                        if legacy_prompt:
+                            qmp('human-monitor-command', {'command-line': 'sendkey ret'})
+                            time.sleep(2)
                         type_command('powershell -nop -ep bypass -c "'
                                      f'iwr -usebasicparsing {base}/ci-deploy.ps1 -outfile x:/ci-deploy.ps1; '
                                      f'& x:/ci-deploy.ps1 -server {base} -os {os_version} -devices {devices}"')
@@ -293,7 +319,7 @@ def run(assets, firmware='uefi', memory=8192, devices='virtio-scsi', boot_source
                         type_command('y')
                         confirmed = True
                         print('Confirmed clearing the single disposable CI disk.', flush=True)
-                    if not launched and 'returned to winpe' in normalized:
+                    if not launched and not gui_closed and 'returned to winpe' in normalized:
                         raise RuntimeError('WinPE prerequisite validation failed before deployment')
                     if not confirmed and time.monotonic() > confirmation_deadline:
                         raise TimeoutError('The guarded GUI/disk-confirmation stages did not finish within 15 minutes; see screen.txt')

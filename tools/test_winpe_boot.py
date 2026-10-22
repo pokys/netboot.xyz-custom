@@ -132,12 +132,19 @@ def run(assets, firmware='bios', memory=8192, devices='sata', boot_source='netbo
                 qmp('qmp_capabilities')
                 if boot_source == 'iso':
                     # Accommodate Microsoft's optional CD "press any key" prompt.
-                    # Space alone cannot accept the INSTALL deployment safeguard.
                     for _ in range(20):
-                        qmp('human-monitor-command', {'command-line': 'sendkey spc'})
                         time.sleep(1)
+                        prompt = work / 'cd-prompt.png'
+                        qmp('screendump', {'filename': str(prompt), 'format': 'png'})
+                        prompt_text = subprocess.check_output(['tesseract', str(prompt), 'stdout'], stderr=subprocess.DEVNULL, text=True).lower()
+                        if 'press any key' in prompt_text and 'boot' in prompt_text:
+                            qmp('human-monitor-command', {'command-line': 'sendkey spc'})
+                            break
+                        if 'osdcloud' in prompt_text:
+                            break
                 previous = ''
                 probe_started = False
+                gui_closed = False
 
                 def type_command(text):
                     # US keyboard in the stock en-US WinPE image; no INSTALL is sent.
@@ -163,11 +170,28 @@ def run(assets, firmware='bios', memory=8192, devices='sata', boot_source='netbo
                     if normalized != previous:
                         print(text[-1400:], flush=True)
                         previous = normalized
-                    if not probe_started and 'type install' in normalized and 'osdcloud' in normalized:
-                        # Cancel our launcher, then perform read-only checks from cmd.
+                    gui_visible = (('deployment options' in normalized or 'osdcloudgui' in normalized) and
+                                   ('operating system' in normalized or 'driver pack' in normalized))
+                    if not probe_started and not gui_closed and gui_visible:
+                        shutil.copyfile(screenshot, work / 'initial-gui.png')
+                        (work / 'initial-gui.txt').write_text(text)
+                        # Close without clicking Start; keep this a read-only boot test.
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-f4'})
+                        time.sleep(3)
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-tab'})
+                        time.sleep(1)
+                        qmp('human-monitor-command', {'command-line': 'sendkey alt-spc'})
+                        time.sleep(1)
+                        qmp('human-monitor-command', {'command-line': 'sendkey x'})
+                        gui_closed = True
+                        continue
+                    legacy_prompt = 'type install' in normalized and 'osdcloud' in normalized
+                    if not probe_started and (legacy_prompt or (gui_closed and 'returned to winpe' in normalized)):
+                        # Older releases have a text gate; new releases open their GUI directly.
                         # Getting this far proves Get-Disk saw the only attached test disk.
-                        qmp('human-monitor-command', {'command-line': 'sendkey ret'})
-                        time.sleep(2)
+                        if legacy_prompt:
+                            qmp('human-monitor-command', {'command-line': 'sendkey ret'})
+                            time.sleep(2)
                         type_command('powershell -nop -ep bypass -c "$erroractionpreference=\'stop\'; '
                                      'import-module powershellget -requiredversion 2.2.5 -ea stop; '
                                      'import-packageprovider nuget -minimumversion 2.8.5.201 -ea stop | out-null; '
@@ -182,13 +206,13 @@ def run(assets, firmware='bios', memory=8192, devices='sata', boot_source='netbo
                     if probe_started and network_probe_received.is_set() and osd_download_received.is_set():
                         print('PASS: Test disk visible, HTTP networking, PowerShellGet/NuGet/Find-Module and OSD WebClient download work. No deployment started.', flush=True)
                         return
-                    if not probe_started and 'returned to winpe' in normalized:
-                        raise RuntimeError('WinPE launcher failed before its confirmation prompt; see screenshot')
+                    if not probe_started and not gui_closed and 'returned to winpe' in normalized:
+                        raise RuntimeError('WinPE launcher failed before opening its GUI; see screenshot')
                     if 'running scripts is disabled' in normalized or 'could not be loaded' in normalized:
                         raise RuntimeError('A PowerShell module failed to load; see screenshot')
                     if '0xc000000f' in normalized or 'boot configuration data' in normalized:
                         raise RuntimeError('Windows Boot Manager rejected the boot configuration')
-            raise TimeoutError('WinPE did not reach its confirmation prompt; see screenshot')
+            raise TimeoutError('WinPE did not finish the read-only GUI/network probe; see screenshot')
         finally:
             server.shutdown()
             server.server_close()
