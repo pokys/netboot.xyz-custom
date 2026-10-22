@@ -5,7 +5,8 @@ param(
     [string]$OutputPath = (Join-Path $PSScriptRoot '..\artifacts\osdcloud'),
     [string]$WorkPath = (Join-Path $PSScriptRoot '..\.build\osdcloud'),
     [string]$AdkRoot = "${env:ProgramFiles(x86)}\Windows Kits\10\Assessment and Deployment Kit",
-    [string]$DriverPath
+    [string]$DriverPath,
+    [string]$PhysicalDriverPath
 )
 
 $ErrorActionPreference = 'Stop'
@@ -27,6 +28,9 @@ foreach ($required in @($sourceWim, $dism) + @($bootFiles.Values) + @($packages 
 }
 if ($DriverPath -and -not (Test-Path -LiteralPath $DriverPath -PathType Container)) {
     throw 'DriverPath must be an existing directory containing extracted, signed x64 INF drivers.'
+}
+if ($PhysicalDriverPath -and -not (Test-Path -LiteralPath (Join-Path $PhysicalDriverPath 'winpe-physical-drivers.json'))) {
+    throw 'PhysicalDriverPath must contain the verified physical driver payload and manifest.'
 }
 $OutputPath = [IO.Path]::GetFullPath($OutputPath)
 $WorkPath = [IO.Path]::GetFullPath($WorkPath)
@@ -72,6 +76,21 @@ try {
         else {
             Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Driver', "/Driver:$([IO.Path]::GetFullPath($DriverPath))", '/Recurse')
         }
+    }
+    if ($PhysicalDriverPath) {
+        $physicalManifest = Get-Content -LiteralPath (Join-Path $PhysicalDriverPath 'winpe-physical-drivers.json') -Raw | ConvertFrom-Json
+        foreach ($driver in @($physicalManifest.drivers | Where-Object {$_.pe -ne $false})) {
+            $inf = Join-Path ([IO.Path]::GetFullPath($PhysicalDriverPath)) $driver.inf
+            if ((Get-FileHash -LiteralPath $inf -Algorithm SHA256).Hash -ne $driver.infSHA256) {
+                throw "Physical PE INF SHA256 mismatch: $($driver.name)"
+            }
+            Invoke-AdkDism -DismArguments @("/Image:$($mount.FullName)", '/Add-Driver', "/Driver:$inf")
+        }
+        $targetDrivers = New-Item -ItemType Directory -Path (Join-Path $mount.FullName 'ProgramData\OSDCloud\PhysicalDrivers') -Force
+        Get-ChildItem -LiteralPath $PhysicalDriverPath | Copy-Item -Destination $targetDrivers.FullName -Recurse
+        $shutdownScripts = New-Item -ItemType Directory -Path (Join-Path $mount.FullName 'OSDCloud\Config\Scripts\Shutdown') -Force
+        Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\Install-PhysicalTargetDrivers.ps1') -Destination $shutdownScripts.FullName
+        Copy-Item -LiteralPath (Join-Path $PhysicalDriverPath 'winpe-physical-drivers.json') -Destination (Join-Path $OutputPath 'physical-drivers.json')
     }
     # Pin the PowerShell 5.1-compatible OSD implementation used by this launcher.
     # This is the standalone OSD module, not the newer OSDeploy build tooling.

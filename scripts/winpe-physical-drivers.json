@@ -1,0 +1,129 @@
+{
+  "schemaVersion": 1,
+  "source": "https://www.dell.com/support/kbdoc/en-us/000211541/winpe-11-driver-pack",
+  "pack": "WinPE11-A11-KHF4P",
+  "url": "https://downloads.dell.com/FOLDER15124725M/1/WinPE11.0-Drivers-A11-KHF4P.cab",
+  "sha256": "39665d324e4b090f4bcfc7db434b0d9b3924c554694e1bcd7c55675984576830",
+  "maxPayloadBytes": 67108864,
+  "drivers": [
+    {
+      "name": "Intel-RST-17",
+      "inf": "winpe/x64/storage/A_KW2XT_A00-00/WMP/production/Windows11-x64/f6flpy-x64/iaStorAC.inf",
+      "version": "17.11.0.1000",
+      "catalog": "iaStorAC.cat",
+      "driverClass": "SCSIAdapter",
+      "infSHA256": "ae6a3c804c020a536a6ea3d44778c83c015dcbd75eff83aeaa911e44a1deed16",
+      "targetMinBuild": 10240
+    },
+    {
+      "name": "Intel-RST-18",
+      "inf": "winpe/x64/storage/B_6D2KD_A00-00/WMP/production/Windows11-x64/Drivers/RAID/iaStorAC.inf",
+      "version": "18.37.1.1003",
+      "catalog": "iaStorAC.cat",
+      "driverClass": "SCSIAdapter",
+      "infSHA256": "d27235a189b3c7d74829cadd2bbd1139f8fb2171c16fa141fb72335cb924490b",
+      "targetMinBuild": 15063
+    },
+    {
+      "name": "Intel-VMD-19",
+      "inf": "winpe/x64/storage/C_R6VYH_A00-00/production/Windows11-x64/VMD/iaStorVD.inf",
+      "version": "19.5.1.1040",
+      "catalog": "iaStorVD.cat",
+      "driverClass": "SCSIAdapter",
+      "infSHA256": "1fd415b0b80bea5960c9f356dc2ed869cfb6e1b668cab3d964c612b14117811f",
+      "targetMinBuild": 15063
+    },
+    {
+      "name": "Intel-VMD-20",
+      "inf": "winpe/x64/storage/D_108HG_A00-00/Drivers/20/VMD/iaStorVD.inf",
+      "version": "20.2.6.1025",
+      "catalog": "iaStorVD.cat",
+      "driverClass": "SCSIAdapter",
+      "infSHA256": "ed5fd2234947ff6d67ef8efccae6b4be1f0aa5b65188ce40d98f927d5c0c80d0",
+      "targetMinBuild": 19041
+    },
+    {
+      "name": "Intel-VMD-21",
+      "inf": "winpe/x64/storage/D_108HG_A00-00/Drivers/21/VMD/iaStorVD21.inf",
+      "version": "21.0.0.1033",
+      "catalog": "iaStorVD21.cat",
+      "driverClass": "SCSIAdapter",
+      "infSHA256": "238b33a7ceb775c94ab827c5d551054d85a1b3fe008ec8b236aa44f06c1fc969",
+      "targetMinBuild": 19041
+    },
+    {
+      "name": "Intel-I219",
+      "inf": "winpe/x64/network/Y23GN_A00-00/i219/e1d.inf",
+      "version": "12.19.2.62",
+      "catalog": "e1d.cat",
+      "driverClass": "Net",
+      "infSHA256": "cfa4710c89f21484ed0a34472d7b68ea1fe4445754d6c7c55e42633eb9de5ee4",
+      "targetMinBuild": 18362
+    },
+    {
+      "name": "Intel-I219-NetAdapterCx",
+      "inf": "winpe/x64/network/Y23GN_A00-00/i219/e1dn.inf",
+      "version": "20.0.2.22",
+      "catalog": "e1dn.cat",
+      "driverClass": "Net",
+      "infSHA256": "f2366a0880bb0990252dda690e7bac82f30ecc547c6a70f5b124df75865fae6c",
+      "targetMinBuild": 22000
+    },
+    {
+      "name": "Intel-I225-I226",
+      "inf": "winpe/x64/network/6MGPD_A00-00/WMP/production/Windows11-x64/e2f.inf",
+      "version": "1.1.3.34",
+      "catalog": "e2f.cat",
+      "driverClass": "Net",
+      "infSHA256": "5062a99a115ca99dfd1d98ff58c9cf9f295b7dde24c34e48dcfc1ee862b0746b",
+      "targetMinBuild": 17763
+    },
+    {
+      "name": "Realtek-PCIe",
+      "inf": "winpe/x64/network/31M22_A00-00/22000/Drivers/64/rt640x64.inf",
+      "version": "10.074.1128.2024",
+      "catalog": "rt640x64.cat",
+      "driverClass": "Net",
+      "infSHA256": "c34b9b87ace280c2b55784a3aa85c24ca2814815997379a776c5b46b15309fd6",
+      "targetMinBuild": 10240
+    },
+    {
+      "name": "Realtek-USB-8152",
+      "inf": "winpe/x64/network/7NXW4_A00-00/WMP/Production/Windows11-x64/22000/rtu52cx22x64.inf",
+      "version": "1152.22.0113.2026",
+      "catalog": "rtu52cx22x64.cat",
+      "driverClass": "Net",
+      "infSHA256": "f24ce2716e798eb1a3b1b07d3173353aa7051c9bb81e0ed2cd524d42286a0901",
+      "targetMinBuild": 22000
+    },
+    {
+      "name": "Realtek-USB-8153",
+      "inf": "winpe/x64/network/7NXW4_A00-00/WMP/Production/Windows11-x64/22000/rtu53cx22x64.inf",
+      "version": "1153.22.0113.2026",
+      "catalog": "rtu53cx22x64.cat",
+      "driverClass": "Net",
+      "infSHA256": "f1fb9966cf50d2d1a6687b631244d98b79180554834d2d2e934557026ce7d89c",
+      "targetMinBuild": 22000
+    },
+    {
+      "name": "Realtek-USB-8156",
+      "inf": "winpe/x64/network/7NXW4_A00-00/WMP/Production/Windows11-x64/22000/rtu56cx22x64.inf",
+      "version": "1156.22.0113.2026",
+      "catalog": "rtu56cx22x64.cat",
+      "driverClass": "Net",
+      "infSHA256": "4bd456febf8a510fc7f8ac6375b4c023a262a9dc494207fdec0b94baf4260c22",
+      "targetMinBuild": 22000
+    },
+    {
+      "name": "Realtek-USB-Legacy",
+      "inf": "winpe/x64/network/WCGPP_A00-00/WMP/production/Windows11-x64/rtump64x64.INF",
+      "version": "10.48.0914.2021",
+      "catalog": "rtump64x64.cat",
+      "driverClass": "Net",
+      "infSHA256": "f7605553da2fe6f8d45c01e8d190acc8bde97b0ec205afc6df2e4249f06fc5b0",
+      "targetMinBuild": 10240,
+      "pe": false,
+      "targetMaxBuild": 21999
+    }
+  ]
+}
