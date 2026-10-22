@@ -170,8 +170,8 @@ def run(assets, firmware='bios', memory=8192, devices='sata', boot_source='netbo
                     if normalized != previous:
                         print(text[-1400:], flush=True)
                         previous = normalized
-                    gui_visible = (('deployment options' in normalized or 'osdcloudgui' in normalized) and
-                                   ('operating system' in normalized or 'driver pack' in normalized))
+                    gui_visible = ('deployment options' in normalized and
+                                   'osdcloudgui' in normalized.replace('0sdcloudgui', 'osdcloudgui'))
                     if not probe_started and not gui_closed and gui_visible:
                         shutil.copyfile(screenshot, work / 'initial-gui.png')
                         (work / 'initial-gui.txt').write_text(text)
