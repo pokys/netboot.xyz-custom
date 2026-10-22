@@ -222,10 +222,10 @@ Pro opakovaný build zvol nové adresáře:
 Výchozí menu očekává tyto adresy:
 
 ```text
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v11/boot.wim
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v11/wimboot
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v11/BCD
-https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v11/boot.sdi
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v12/boot.wim
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v12/wimboot
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v12/BCD
+https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v12/boot.sdi
 ```
 
 Po ručním buildu vytvoř GitHub Release s novým tagem a přilož všechny čtyři soubory
