@@ -111,6 +111,8 @@ try {
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\Start-Install.ps1') -Destination $system32
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\startnet.cmd') -Destination $system32
     Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\OSDCloud.Runtime.psm1') -Destination $system32
+    $automate = New-Item -ItemType Directory -Path (Join-Path $mount.FullName 'OSDCloud\Automate') -Force
+    Copy-Item -LiteralPath (Join-Path $PSScriptRoot '..\winpe\Start-OSDCloudGUI.json') -Destination $automate.FullName
     $fixture = New-Item -ItemType Directory -Path (Join-Path $WorkPath 'runtime-fixture')
     'OSDCLOUD-WIM-PASS' | Set-Content -LiteralPath (Join-Path $fixture.FullName 'probe.txt') -Encoding Ascii
     Invoke-AdkDism -DismArguments @('/Capture-Image', "/ImageFile:$system32\OSDCloud-test.wim", "/CaptureDir:$($fixture.FullName)", '/Name:OSDCloudRuntime', '/Compress:fast', '/CheckIntegrity')
