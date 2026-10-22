@@ -12,7 +12,8 @@ iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/d
 iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v9 && clear osdcloud_base_url ||
 iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v10 && clear osdcloud_base_url ||
 iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v11 && clear osdcloud_base_url ||
-isset ${osdcloud_base_url} || set osdcloud_base_url https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v12
+iseq ${osdcloud_base_url} https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v12 && clear osdcloud_base_url ||
+isset ${osdcloud_base_url} || set osdcloud_base_url https://github.com/pokys/netboot.xyz-custom/releases/download/osdcloud-v12.1
 
 :windows
 menu Windows 10 / 11 - OSDCloud installer
